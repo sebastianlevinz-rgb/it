@@ -127,7 +127,7 @@ export default function CravingsManager() {
                                 <p>Observe the craving. Does it change?</p>
 
                                 <button
-                                    onClick={() => setTimeLeft(0)}
+                                    onClick={() => setActiveState({ isActive: false })}
                                     className="text-xs text-red-400 hover:text-red-500 transition-colors mt-8 underline decoration-dotted"
                                 >
                                     I need to act now (End Timer)
@@ -175,7 +175,7 @@ export default function CravingsManager() {
             <div className="col-span-2 bg-card rounded-xl p-4 border border-muted">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold capitalize flex items-center gap-2">
-                        {isFood ? <Utensils size={20} className="text-orange-400" /> : <Leaf size={20} className="text-emerald-400" />}
+                        {isFood ? <Utensils size={20} className="text-orange-400" /> : <Leaf size={20} className="text-primary" />}
                         New {selectionMode} Craving
                     </h2>
                     <button onClick={() => setSelectionMode(null)} className="p-2 hover:bg-zinc-800 rounded-full">
@@ -267,7 +267,7 @@ export default function CravingsManager() {
                     <button
                         disabled={!category || !specificTrigger || isSubmitting}
                         onClick={handleStartImpulse}
-                        className="w-full bg-primary hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all mt-4 flex items-center justify-center gap-2"
+                        className="w-full bg-primary hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold py-4 rounded-xl transition-all mt-4 flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(57,255,20,0.4)]"
                     >
                         {isSubmitting ? "Starting..." : "Start 20m Timer"}
                         <Play size={18} fill="currentColor" />
@@ -283,15 +283,18 @@ export default function CravingsManager() {
         <>
             {/* Weed Card */}
             {/* Weed Card */}
-            <div className="ghibli-card flex flex-col justify-between aspect-square group">
-                <div className="p-3 bg-primary/10 w-fit rounded-xl text-primary group-hover:scale-110 transition-transform duration-300">
-                    <Leaf size={28} />
+            <div className="ghibli-card flex flex-col justify-between aspect-square group overflow-hidden relative">
+                <div className="absolute top-0 right-0 p-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                    <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_#39FF14] animate-pulse"></div>
+                </div>
+                <div className="p-3 bg-primary/10 w-fit rounded-xl text-primary group-hover:scale-110 transition-transform duration-500 animate-float shadow-[0_0_20px_rgba(57,255,20,0.3)]">
+                    <Leaf size={32} strokeWidth={2.5} />
                 </div>
                 <div>
-                    <h2 className="font-bold text-lg mb-2 text-primary">Weed</h2>
+                    <h2 className="font-bold text-lg mb-2 text-primary drop-shadow-[0_0_5px_rgba(57,255,20,0.5)]">Weed</h2>
                     <button
                         onClick={() => setSelectionMode("weed")}
-                        className="w-full bg-primary/10 hover:bg-primary hover:text-white text-primary text-sm font-bold py-3 rounded-xl transition-all"
+                        className="w-full bg-primary/10 hover:bg-primary hover:text-black text-primary text-sm font-bold py-3 rounded-xl transition-all border border-primary/20 hover:border-primary shadow-[0_0_10px_rgba(57,255,20,0.1)] hover:shadow-[0_0_20px_rgba(57,255,20,0.4)]"
                     >
                         I feel an impulse
                     </button>
