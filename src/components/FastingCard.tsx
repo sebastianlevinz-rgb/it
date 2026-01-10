@@ -60,7 +60,7 @@ export default function FastingCard() {
                 <button
                     onClick={handleToggle}
                     disabled={loading}
-                    className={`w-full text-base font-bold h-14 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg backdrop-blur-md border border-white/5 ${state.isFasting
+                    className={`w-full text-base font-bold h-12 px-4 whitespace-nowrap rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg backdrop-blur-md border border-white/5 ${state.isFasting
                         ? "bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]"
                         : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
                         }`}

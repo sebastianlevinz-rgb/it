@@ -122,7 +122,7 @@ export default function ExerciseCard() {
                 </div>
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="w-full bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 text-base font-bold h-14 rounded-2xl transition-all flex items-center justify-center gap-2 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.15)]"
+                    className="w-full bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 text-base font-bold h-12 px-4 whitespace-nowrap rounded-2xl transition-all flex items-center justify-center gap-2 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.15)]"
                 >
                     <Plus size={18} /> Log Activity
                 </button>
