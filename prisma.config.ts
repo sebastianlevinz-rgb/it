@@ -9,6 +9,9 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env.DATABASE_URL || "file:./dev.db",
+    // With Prisma 7, the URL is provided here if not in schema for some commands,
+    // but the Client will mainly use the adapter.
+    // However, for migration commands which might use this config:
+    url: process.env.POSTGRES_PRISMA_URL || process.env.DATABASE_URL || "file:./dev.db",
   },
 });

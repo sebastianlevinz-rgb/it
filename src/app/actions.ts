@@ -1,14 +1,9 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-// Using a global instance to prevent connection limits in dev
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
-
-const prisma = globalForPrisma.prisma || new PrismaClient();
-
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+// Using the centralized access from lib/prisma
 
 // Temporary MVP User ID - in a real app this comes from Auth
 const DEMO_USER_ID = "00000000-0000-0000-0000-000000000001";
