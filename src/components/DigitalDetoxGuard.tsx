@@ -85,7 +85,7 @@ export default function DigitalDetoxGuard({ children }: { children: React.ReactN
                         className="w-full max-w-sm mt-8 bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(220,38,38,0.5)] transition-transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3 text-lg z-50 relative"
                     >
                         <Lock size={24} />
-                        EMERGENCY UNLOCK
+                        Bypass for Testing
                     </button>
 
                     <button

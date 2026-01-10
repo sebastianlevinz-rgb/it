@@ -3,8 +3,7 @@
 import { ShieldCheck, Settings, Moon, Wind } from "lucide-react";
 import Link from "next/link";
 import CravingsManager from "@/components/CravingsManager";
-import FastingCard from "@/components/FastingCard";
-import ExerciseCard from "@/components/ExerciseCard";
+
 import BottomNav from "@/components/BottomNav";
 import { logSleepEvent } from "@/app/actions";
 import DigitalDetoxGuard from "@/components/DigitalDetoxGuard";
@@ -65,11 +64,7 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
                     {/* Dynamic Cravings Module handles Weed & Food */}
                     <CravingsManager />
 
-                    {/* Fasting Card */}
-                    <FastingCard />
 
-                    {/* Exercise Card */}
-                    <ExerciseCard />
 
                 </div>
 
