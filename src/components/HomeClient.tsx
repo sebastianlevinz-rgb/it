@@ -16,12 +16,12 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
 
     return (
         <DigitalDetoxGuard>
-            <main className="min-h-screen pb-24 p-6 flex flex-col font-sans max-w-md mx-auto relative bg-[#000000] overflow-hidden">
-                {/* Mesh Gradient Background - Cyan/Emerald Blobs */}
-                <div className="fixed top-[-10%] left-[-20%] w-[500px] h-[500px] bg-cyan-400/20 rounded-full blur-[100px] pointer-events-none mix-blend-screen opacity-40 animate-pulse-slow"></div>
-                <div className="fixed bottom-[-10%] right-[-20%] w-[500px] h-[500px] bg-emerald-500/20 rounded-full blur-[100px] pointer-events-none mix-blend-screen opacity-40 animate-pulse-slow delay-1000"></div>
+            <main className="min-h-screen pb-24 p-5 flex flex-col font-sans max-w-md mx-auto relative bg-black overflow-hidden">
+                {/* Background: Pure Black with Mesh Gradient Blobs */}
+                <div className="fixed top-[-20%] left-[-20%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen animate-pulse-slow"></div>
+                <div className="fixed bottom-[-20%] right-[-20%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen animate-pulse-slow delay-1000"></div>
 
-                {/* Noise Textue */}
+                {/* Noise Texture */}
                 <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
 
                 {/* Breathe Modal */}

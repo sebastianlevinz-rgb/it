@@ -127,7 +127,10 @@ export default function CravingsManager() {
                                 <p>Observe the craving. Does it change?</p>
 
                                 <button
-                                    onClick={() => setActiveState({ isActive: false })}
+                                    onClick={() => {
+                                        setActiveState({ isActive: false });
+                                        setSelectionMode(null);
+                                    }}
                                     className="text-xs text-red-400 hover:text-red-500 transition-colors mt-8 underline decoration-dotted"
                                 >
                                     I need to act now (End Timer)
@@ -296,7 +299,7 @@ export default function CravingsManager() {
                     <h2 className="font-bold text-xl mb-3 text-white text-center">Weed</h2>
                     <button
                         onClick={() => setSelectionMode("weed")}
-                        className="w-full glass-btn-primary h-12 text-base tracking-wide shadow-[0_0_20px_rgba(34,197,94,0.2)] justify-center hover:scale-[1.02] px-4 whitespace-nowrap"
+                        className="glass-btn-primary w-full h-12 text-base tracking-wide justify-center hover:scale-[1.02] px-4 whitespace-nowrap"
                     >
                         I feel an impulse
                     </button>
@@ -317,10 +320,11 @@ export default function CravingsManager() {
                 <div className="w-full">
                     <h2 className="font-bold text-xl mb-3 text-white text-center">Food</h2>
                     <button
-                        onClick={() => setSelectionMode(null)}
-                        className="w-full h-12 px-4 flex items-center justify-center text-sm font-bold text-white/50 hover:text-white transition-colors mt-4 bg-white/5 rounded-xl hover:bg-white/10 whitespace-nowrap"
+                        onClick={() => setSelectionMode("food")}
+                        className="glass-btn-primary w-full h-12 px-4 flex items-center justify-center text-base tracking-wide whitespace-nowrap text-orange-400 bg-orange-500/10 border-orange-500/30 hover:bg-orange-500/20"
+                        style={{ boxShadow: 'none' }}
                     >
-                        End Timer & Return
+                        I feel an impulse
                     </button>
                 </div>
             </div>
