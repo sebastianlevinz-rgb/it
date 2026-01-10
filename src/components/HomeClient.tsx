@@ -1,11 +1,11 @@
 "use client";
 
-import { ShieldCheck, Settings, Moon, Wind } from "lucide-react";
+import { ShieldCheck, Settings, Wind } from "lucide-react";
 import Link from "next/link";
 import CravingsManager from "@/components/CravingsManager";
 
 import BottomNav from "@/components/BottomNav";
-import { logSleepEvent } from "@/app/actions";
+
 import { useState } from "react";
 import BreatheModal from "@/components/BreatheModal";
 
@@ -66,19 +66,7 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
 
             </div>
 
-            {/* Digital Sunset Button */}
-            <div className="mt-auto mb-6 relative z-10">
-                <button
-                    onClick={() => logSleepEvent("sunset_start")}
-                    className="w-full glass-card py-6 flex items-center justify-center gap-4 transition-all group hover:bg-white/5 hover:border-t-white/20"
-                >
-                    <Moon size={24} className="group-hover:rotate-12 transition-transform text-gray-400 group-hover:text-white" fill="currentColor" />
-                    <span className="font-bold text-lg text-gray-400 group-hover:text-white">Digital Sunset Mode</span>
-                </button>
-                <p className="text-center text-xs text-gray-600 mt-4 font-medium tracking-wide opacity-50 uppercase">
-                    Locks functionality until sunrise
-                </p>
-            </div>
+
 
             <BottomNav />
         </main>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Leaf, Utensils, Zap, Moon, Home, BarChart2 } from "lucide-react";
+import { Home, BarChart2 } from "lucide-react";
 import Link from "next/link";
 
 export default function BottomNav() {
@@ -14,10 +14,7 @@ export default function BottomNav() {
                 <BarChart2 size={26} strokeWidth={2.5} />
                 <span className="text-[10px] font-bold">Insights</span>
             </Link>
-            <button className="flex flex-col items-center justify-center space-y-1 text-muted-foreground hover:text-primary transition-colors">
-                <Moon size={26} strokeWidth={2.5} />
-                <span className="text-[10px] font-bold">Sleep</span>
-            </button>
+
         </nav>
     );
 }
