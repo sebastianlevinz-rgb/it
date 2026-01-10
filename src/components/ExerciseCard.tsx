@@ -109,8 +109,8 @@ export default function ExerciseCard() {
                     <div className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_15px_#A855F7] animate-pulse"></div>
                 </div>
 
-                <div className="p-5 bg-purple-500/10 rounded-full text-purple-400 group-hover:scale-110 transition-transform duration-500 backdrop-blur-md border border-purple-500/10 shadow-[0_0_30px_rgba(168,85,247,0.1)] group-hover:shadow-[0_0_60px_rgba(168,85,247,0.3)]">
-                    <Dumbbell size={48} className="drop-shadow-[0_0_10px_rgba(168,85,247,0.6)]" />
+                <div className="p-5 bg-purple-500/10 rounded-full text-purple-400 group-hover:scale-110 transition-transform duration-500 backdrop-blur-sm">
+                    <Dumbbell size={48} className="text-purple-400 glow-icon" />
                 </div>
             </div>
 
@@ -122,7 +122,7 @@ export default function ExerciseCard() {
                 </div>
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="w-full bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 text-base font-bold h-12 px-4 whitespace-nowrap rounded-2xl transition-all flex items-center justify-center gap-2 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.15)]"
+                    className="glass-btn-primary w-full bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 text-base h-12 px-4 whitespace-nowrap justify-center border-purple-500/20"
                 >
                     <Plus size={18} /> Log Activity
                 </button>

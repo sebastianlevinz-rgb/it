@@ -39,8 +39,8 @@ export default function FastingCard() {
                     <div className="w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_15px_#60A5FA] animate-pulse"></div>
                 </div>
 
-                <div className="p-5 bg-blue-500/10 rounded-full text-blue-400 group-hover:scale-110 transition-transform duration-500 backdrop-blur-md border border-blue-400/10 shadow-[0_0_30px_rgba(96,165,250,0.1)] group-hover:shadow-[0_0_60px_rgba(96,165,250,0.3)]">
-                    <Clock size={48} className="drop-shadow-[0_0_10px_rgba(96,165,250,0.6)]" />
+                <div className="p-5 bg-blue-500/10 rounded-full text-blue-400 group-hover:scale-110 transition-transform duration-500 backdrop-blur-sm">
+                    <Clock size={48} className="text-blue-400 glow-icon" />
                 </div>
             </div>
 
@@ -60,9 +60,9 @@ export default function FastingCard() {
                 <button
                     onClick={handleToggle}
                     disabled={loading}
-                    className={`w-full text-base font-bold h-12 px-4 whitespace-nowrap rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg backdrop-blur-md border border-white/5 ${state.isFasting
-                        ? "bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]"
-                        : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                    className={`glass-btn-primary w-full text-base font-bold h-12 px-4 whitespace-nowrap justify-center ${state.isFasting
+                        ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                        : "bg-white/5 text-gray-400 hover:text-white"
                         }`}
                 >
                     {loading ? "..." : state.isFasting ? (
