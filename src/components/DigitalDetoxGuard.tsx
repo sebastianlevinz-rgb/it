@@ -79,9 +79,18 @@ export default function DigitalDetoxGuard({ children }: { children: React.ReactN
                         Drift into the calm.
                     </p>
 
+                    {/* EMERGENCY BYPASS - FORCE UNLOCK */}
+                    <button
+                        onClick={handleUnlock}
+                        className="w-full max-w-sm mt-8 bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(220,38,38,0.5)] transition-transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3 text-lg z-50 relative"
+                    >
+                        <Lock size={24} />
+                        EMERGENCY UNLOCK
+                    </button>
+
                     <button
                         onClick={handleWakeUp}
-                        className="group flex flex-col items-center gap-3 text-[#94a3b8] hover:text-[#e2e8f0] transition-all duration-500"
+                        className="group flex flex-col items-center gap-3 text-[#94a3b8] hover:text-[#e2e8f0] transition-all duration-500 mt-12"
                     >
                         <Sun size={28} className="group-hover:rotate-45 transition-transform duration-700" />
                         <span className="text-[10px] uppercase tracking-[0.2em] font-medium opacity-60 group-hover:opacity-100">I'm Awake</span>
