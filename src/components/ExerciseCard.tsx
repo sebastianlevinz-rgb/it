@@ -103,20 +103,20 @@ export default function ExerciseCard() {
     }
 
     return (
-        <div className="bg-card rounded-xl p-4 flex flex-col justify-between aspect-square border border-muted hover:border-gray-700 transition-colors">
-            <div className="p-2 bg-purple-900/30 w-fit rounded-lg text-purple-400">
-                <Dumbbell size={24} />
+        <div className="ghibli-card flex flex-col justify-between aspect-square group bg-white/60">
+            <div className="p-3 bg-purple-100/50 w-fit rounded-xl text-purple-600 group-hover:scale-110 transition-transform duration-300">
+                <Dumbbell size={28} />
             </div>
             <div>
-                <h2 className="font-semibold text-lg mb-1">Exercise</h2>
-                <div className="text-sm text-gray-400 mb-3">
-                    Today: <span className="text-white font-medium">{dailyMinutes} mins</span>
+                <h2 className="font-bold text-lg mb-2 text-foreground">Exercise</h2>
+                <div className="text-sm text-muted-foreground mb-4 font-medium">
+                    Today: <span className="text-purple-700 font-bold">{dailyMinutes} mins</span>
                 </div>
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="w-full bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium py-2 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    className="w-full bg-purple-100 hover:bg-purple-200 text-purple-700 text-sm font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
                 >
-                    <Plus size={16} /> Log Activity
+                    <Plus size={18} /> Log Activity
                 </button>
             </div>
         </div>

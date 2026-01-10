@@ -19,23 +19,23 @@ export default function HomePage() {
 
   return (
     <DigitalDetoxGuard>
-      <main className="min-h-screen pb-20 p-4 flex flex-col">
-        <header className="mb-6 mt-2 flex justify-between items-start">
+      <main className="min-h-screen pb-24 p-6 flex flex-col font-sans max-w-md mx-auto">
+        <header className="mb-8 mt-4 flex justify-between items-end">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Impulse Tracker</h1>
-            <p className="text-gray-400 text-sm">Neutral observation.</p>
+            <h1 className="text-3xl font-bold tracking-tight text-primary">Impulse Tracker</h1>
+            <p className="text-muted-foreground text-sm font-medium">Neutral observation.</p>
           </div>
           <div className="flex items-center gap-3">
             {agencyScore !== null && (
               <div className="flex flex-col items-end">
-                <span className="text-xs text-gray-500 uppercase tracking-wider">Weekly Agency</span>
-                <div className="flex items-center gap-1 text-emerald-400">
-                  <ShieldCheck size={16} />
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Weekly Agency</span>
+                <div className="flex items-center gap-1 text-primary">
+                  <ShieldCheck size={18} />
                   <span className="font-bold text-xl">{agencyScore}%</span>
                 </div>
               </div>
             )}
-            <Link href="/settings" className="p-2 hover:bg-zinc-900 rounded-full text-zinc-500 hover:text-white transition-colors">
+            <Link href="/settings" className="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
               <Settings size={20} />
             </Link>
           </div>
@@ -59,12 +59,12 @@ export default function HomePage() {
         <div className="mt-auto mb-4">
           <button
             onClick={() => logSleepEvent("sunset_start")}
-            className="w-full bg-indigo-900/50 hover:bg-indigo-900/80 border border-indigo-500/30 text-indigo-300 py-4 rounded-xl flex items-center justify-center gap-2 transition-all group"
+            className="w-full bg-[#2C3327] hover:bg-[#1a1f18] text-[#FDFBF7] py-5 rounded-2xl flex items-center justify-center gap-3 transition-all group shadow-lg shadow-black/5"
           >
-            <Moon size={20} className="group-hover:scale-110 transition-transform" />
-            <span className="font-semibold">Digital Sunset Mode (Go to Sleep)</span>
+            <Moon size={22} className="group-hover:rotate-12 transition-transform text-secondary" />
+            <span className="font-bold text-lg">Digital Sunset Mode</span>
           </button>
-          <p className="text-center text-xs text-gray-600 mt-2">
+          <p className="text-center text-xs text-muted-foreground mt-3 font-medium opacity-80">
             Locks functionality until sunrise
           </p>
         </div>

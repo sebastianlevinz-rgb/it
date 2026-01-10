@@ -102,7 +102,7 @@ export default function CravingsManager() {
         const percent = timeLeft !== null ? ((20 * 60 * 1000 - timeLeft) / (20 * 60 * 1000)) * 100 : 0;
 
         return (
-            <div className="col-span-2 bg-card rounded-xl p-6 border border-primary/20 flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden">
+            <div className="col-span-2 ghibli-card flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden bg-white/50 border-primary/10">
                 {/* Progress Background */}
                 <div
                     className="absolute bottom-0 left-0 h-1 bg-primary/30 transition-all duration-1000"
@@ -112,23 +112,23 @@ export default function CravingsManager() {
                 <div className="text-center z-10 w-full max-w-md">
                     {!isReady ? (
                         <>
-                            <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary animate-pulse">
-                                <Clock size={32} />
+                            <div className="mb-4 inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 text-primary animate-pulse">
+                                <Clock size={40} />
                             </div>
-                            <h2 className="text-4xl font-mono font-bold font-numeric mb-2">
+                            <h2 className="text-5xl font-bold font-numeric mb-3 text-primary">
                                 {timeLeft !== null ? formatTime(timeLeft) : "--:--"}
                             </h2>
-                            <p className="text-lg text-gray-300 font-medium mb-6">
-                                You’re not deciding not to {activeState.payload.type === "weed" ? "smoke" : "eat"}.<br />
-                                <span className="text-primary">You’re deciding to wait.</span>
+                            <p className="text-lg text-foreground/80 font-medium mb-8 max-w-xs mx-auto leading-relaxed">
+                                You’re not deciding not to {activeState.payload?.type === "weed" ? "smoke" : "eat"}.<br />
+                                <span className="text-primary font-bold">You’re deciding to wait.</span>
                             </p>
-                            <div className="space-y-4 text-sm text-gray-500">
-                                <p>Status: <span className="text-white capitalize">{activeState.payload.category} ({activeState.payload.specificTrigger})</span></p>
+                            <div className="space-y-4 text-sm text-muted-foreground">
+                                <p>Status: <span className="text-foreground capitalize font-bold">{activeState.payload?.category} ({activeState.payload?.specificTrigger})</span></p>
                                 <p>Observe the craving. Does it change?</p>
 
                                 <button
                                     onClick={() => setTimeLeft(0)}
-                                    className="text-xs text-red-900/40 hover:text-red-500 transition-colors mt-8 underline decoration-dotted"
+                                    className="text-xs text-red-400 hover:text-red-500 transition-colors mt-8 underline decoration-dotted"
                                 >
                                     I need to act now (End Timer)
                                 </button>
@@ -136,17 +136,17 @@ export default function CravingsManager() {
                         </>
                     ) : (
                         <>
-                            <div className="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400">
+                            <div className="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 text-primary">
                                 <CheckCircle size={32} />
                             </div>
-                            <h2 className="text-2xl font-bold mb-4">20 Minutes Complete</h2>
-                            <p className="text-gray-400 mb-8">The pause is over. You have Agency. What do you choose?</p>
+                            <h2 className="text-2xl font-bold mb-4 text-primary">20 Minutes Complete</h2>
+                            <p className="text-foreground/70 mb-8">The pause is over. You have Agency. What do you choose?</p>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <button
                                     onClick={() => handleOutcome("resisted")}
                                     disabled={isSubmitting}
-                                    className="bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-xl font-semibold transition-colors flex flex-col items-center justify-center gap-2"
+                                    className="ghibli-btn-primary py-4"
                                 >
                                     <Leaf size={24} />
                                     Didn't Do It
@@ -154,7 +154,7 @@ export default function CravingsManager() {
                                 <button
                                     onClick={() => handleOutcome("consumed")}
                                     disabled={isSubmitting}
-                                    className="bg-zinc-800 hover:bg-zinc-700 text-gray-300 hover:text-white py-4 rounded-xl font-semibold transition-colors flex flex-col items-center justify-center gap-2"
+                                    className="ghibli-btn bg-muted text-muted-foreground hover:bg-muted/80 py-4"
                                 >
                                     <AlertCircle size={24} />
                                     Did It
@@ -282,15 +282,16 @@ export default function CravingsManager() {
     return (
         <>
             {/* Weed Card */}
-            <div className="bg-card rounded-xl p-4 flex flex-col justify-between aspect-square border border-muted hover:border-gray-700 transition-colors">
-                <div className="p-2 bg-emerald-900/30 w-fit rounded-lg text-emerald-400">
-                    <Leaf size={24} />
+            {/* Weed Card */}
+            <div className="ghibli-card flex flex-col justify-between aspect-square group">
+                <div className="p-3 bg-primary/10 w-fit rounded-xl text-primary group-hover:scale-110 transition-transform duration-300">
+                    <Leaf size={28} />
                 </div>
                 <div>
-                    <h2 className="font-semibold text-lg mb-1">Weed</h2>
+                    <h2 className="font-bold text-lg mb-2 text-primary">Weed</h2>
                     <button
                         onClick={() => setSelectionMode("weed")}
-                        className="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+                        className="w-full bg-primary/10 hover:bg-primary hover:text-white text-primary text-sm font-bold py-3 rounded-xl transition-all"
                     >
                         I feel an impulse
                     </button>
@@ -298,15 +299,15 @@ export default function CravingsManager() {
             </div>
 
             {/* Food Card */}
-            <div className="bg-card rounded-xl p-4 flex flex-col justify-between aspect-square border border-muted hover:border-gray-700 transition-colors">
-                <div className="p-2 bg-orange-900/30 w-fit rounded-lg text-orange-400">
-                    <Utensils size={24} />
+            <div className="ghibli-card flex flex-col justify-between aspect-square group">
+                <div className="p-3 bg-secondary/20 w-fit rounded-xl text-secondary-foreground group-hover:scale-110 transition-transform duration-300">
+                    <Utensils size={28} />
                 </div>
                 <div>
-                    <h2 className="font-semibold text-lg mb-1">Food</h2>
+                    <h2 className="font-bold text-lg mb-2 text-secondary-foreground">Food</h2>
                     <button
                         onClick={() => setSelectionMode("food")}
-                        className="w-full bg-orange-600 hover:bg-orange-500 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+                        className="w-full bg-secondary/20 hover:bg-secondary hover:text-white text-secondary-foreground text-sm font-bold py-3 rounded-xl transition-all"
                     >
                         New Craving
                     </button>
