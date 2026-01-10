@@ -283,18 +283,22 @@ export default function CravingsManager() {
         <>
             {/* Weed Card */}
             {/* Weed Card */}
-            <div className="glass-card flex flex-col justify-between aspect-square group overflow-hidden relative border-primary/20 hover:border-primary/50">
-                <div className="absolute top-0 right-0 p-2 opacity-50 group-hover:opacity-100 transition-opacity">
-                    <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_#10B981] animate-pulse"></div>
+            {/* Weed Card - Pillar 2: Neon Glow + Pillar 5: Minimalism */}
+            <div className="glass-card flex flex-col justify-between aspect-square group overflow-hidden relative hover:border-t-primary/50 transition-all duration-500">
+                <div className="absolute top-0 right-0 p-3 opacity-30 group-hover:opacity-100 transition-opacity">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_15px_#10B981] animate-pulse"></div>
                 </div>
-                <div className="p-3 bg-primary/10 w-fit rounded-xl text-primary group-hover:scale-110 transition-transform duration-500 animate-float shadow-[0_0_30px_rgba(16,185,129,0.2)] backdrop-blur-md">
-                    <Cannabis size={36} strokeWidth={2} />
+
+                {/* Icon Container with specific drop-shadow glow */}
+                <div className="p-4 w-fit rounded-2xl text-primary group-hover:scale-110 transition-transform duration-500 animate-float backdrop-blur-sm border border-white/5 bg-white/5 shadow-[0_0_30px_rgba(16,185,129,0.1)] group-hover:shadow-[0_0_50px_rgba(16,185,129,0.3)]">
+                    <Cannabis size={40} className="drop-shadow-[0_0_15px_#10B981]" />
                 </div>
+
                 <div>
-                    <h2 className="font-bold text-lg mb-2 text-white drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">Weed</h2>
+                    <h2 className="font-bold text-xl mb-3 text-white">Weed</h2>
                     <button
                         onClick={() => setSelectionMode("weed")}
-                        className="w-full glass-btn-primary py-3 hover:scale-[1.02] text-sm"
+                        className="w-full glass-btn-primary py-3.5 hover:scale-[1.02] text-sm tracking-wide shadow-[0_0_20px_rgba(16,185,129,0.2)]"
                     >
                         I feel an impulse
                     </button>
