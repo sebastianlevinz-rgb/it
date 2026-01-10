@@ -285,7 +285,7 @@ export default function CravingsManager() {
     return (
         <>
             {/* Weed Card: Perfect Symmetry */}
-            <div className="glass-card flex flex-col items-center justify-between aspect-square group overflow-hidden relative hover:border-t-green-500/30 transition-all duration-500 h-full">
+            <div className="glass-card flex flex-col items-center justify-between aspect-square group overflow-hidden relative hover:border-t-green-500/30 transition-all duration-500 h-full animate-float delay-500">
                 <div className="flex-1 flex flex-col items-center justify-center w-full relative">
                     <div className="absolute top-0 right-0 p-3 opacity-30 group-hover:opacity-100 transition-opacity">
                         <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_15px_#22c55e] animate-pulse"></div>
@@ -307,7 +307,7 @@ export default function CravingsManager() {
             </div>
 
             {/* Food Card: Perfect Symmetry */}
-            <div className="glass-card flex flex-col items-center justify-between aspect-square group overflow-hidden relative hover:border-t-orange-500/30 transition-all duration-500 h-full">
+            <div className="glass-card flex flex-col items-center justify-between aspect-square group overflow-hidden relative hover:border-t-orange-500/30 transition-all duration-500 h-full animate-float delay-1000">
                 <div className="flex-1 flex flex-col items-center justify-center w-full relative">
                     <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                         <div className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_15px_#F97316] animate-pulse"></div>
