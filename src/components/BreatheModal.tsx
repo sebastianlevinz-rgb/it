@@ -70,33 +70,33 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
     }, []);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1120]/95 backdrop-blur-xl animate-in fade-in duration-500">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-2xl animate-in fade-in duration-500">
             <button
                 onClick={onClose}
-                className="absolute top-6 right-6 p-4 rounded-full bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition-all"
+                className="absolute top-6 right-6 p-4 rounded-full bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition-all border border-white/5 hover:border-white/10"
             >
                 <X size={32} />
             </button>
 
-            <div className="flex flex-col items-center gap-12">
+            <div className="flex flex-col items-center gap-12 relative z-10 scale-125">
                 {/* Visualizer */}
                 <div className="relative flex items-center justify-center">
                     {/* Outer Glow */}
                     <div
-                        className={`absolute rounded-full blur-3xl transition-all duration-[4000ms] ease-in-out bg-primary/20
-                        ${phase === "inhale" ? "w-96 h-96 opacity-60" : phase === "hold" ? "w-80 h-80 opacity-40" : "w-32 h-32 opacity-20"}
+                        className={`absolute rounded-full blur-[100px] transition-all duration-[4000ms] ease-in-out bg-primary/30
+                        ${phase === "inhale" ? "w-[500px] h-[500px] opacity-60" : phase === "hold" ? "w-[400px] h-[400px] opacity-40" : "w-[200px] h-[200px] opacity-20"}
                         `}
                     />
 
                     {/* Core Circle */}
                     <div
-                        className={`relative z-10 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(57,255,20,0.2)] border border-primary/30 transition-all duration-[4000ms] ease-in-out
+                        className={`relative z-10 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.3)] border border-primary/40 transition-all duration-[4000ms] ease-in-out backdrop-blur-sm
                         ${phase === "inhale" ? "w-64 h-64 bg-primary/10 scale-100" : phase === "hold" ? "w-64 h-64 bg-primary/5 scale-100" : "w-24 h-24 bg-primary/5 scale-100"}
                         `}
                     >
                         <Wind
                             size={48}
-                            className={`text-primary transition-all duration-[4000ms] 
+                            className={`text-primary transition-all duration-[4000ms] drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]
                             ${phase === "exhale" ? "opacity-50 scale-75" : "opacity-100 scale-110"}
                             `}
                         />
@@ -104,17 +104,17 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
 
                     {/* Ripple/Ring (only during inhale) */}
                     <div
-                        className={`absolute rounded-full border border-primary/20 transition-all duration-[4000ms] ease-out
-                         ${phase === "inhale" ? "w-80 h-80 opacity-0" : "w-24 h-24 opacity-0"}
+                        className={`absolute rounded-full border border-primary/30 transition-all duration-[4000ms] ease-out
+                         ${phase === "inhale" ? "w-96 h-96 opacity-0" : "w-24 h-24 opacity-0"}
                         `}
                     />
                 </div>
 
                 <div className="text-center">
-                    <h2 className="text-4xl font-bold text-primary tracking-widest uppercase transition-all duration-500">
+                    <h2 className="text-5xl font-bold text-white tracking-[0.2em] uppercase transition-all duration-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">
                         {text}
                     </h2>
-                    <p className="text-muted-foreground mt-4 text-lg">Focus on your breath.</p>
+                    <p className="text-gray-500 mt-4 text-xl font-light">Focus on your breath.</p>
                 </div>
             </div>
         </div>

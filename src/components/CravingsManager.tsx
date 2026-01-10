@@ -1,6 +1,6 @@
 "use client";
 
-import { Leaf, Utensils, X, Clock, CheckCircle, AlertCircle, Play } from "lucide-react";
+import { Leaf, Utensils, X, Clock, CheckCircle, AlertCircle, Play, Cannabis } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { logImpulse, getActiveImpulseState, logOutcome, type TriggerPayload, type ActiveState } from "@/app/actions";
 
@@ -283,18 +283,18 @@ export default function CravingsManager() {
         <>
             {/* Weed Card */}
             {/* Weed Card */}
-            <div className="ghibli-card flex flex-col justify-between aspect-square group overflow-hidden relative">
+            <div className="glass-card flex flex-col justify-between aspect-square group overflow-hidden relative border-primary/20 hover:border-primary/50">
                 <div className="absolute top-0 right-0 p-2 opacity-50 group-hover:opacity-100 transition-opacity">
-                    <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_#39FF14] animate-pulse"></div>
+                    <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_#10B981] animate-pulse"></div>
                 </div>
-                <div className="p-3 bg-primary/10 w-fit rounded-xl text-primary group-hover:scale-110 transition-transform duration-500 animate-float shadow-[0_0_20px_rgba(57,255,20,0.3)]">
-                    <Leaf size={32} strokeWidth={2.5} />
+                <div className="p-3 bg-primary/10 w-fit rounded-xl text-primary group-hover:scale-110 transition-transform duration-500 animate-float shadow-[0_0_30px_rgba(16,185,129,0.2)] backdrop-blur-md">
+                    <Cannabis size={36} strokeWidth={2} />
                 </div>
                 <div>
-                    <h2 className="font-bold text-lg mb-2 text-primary drop-shadow-[0_0_5px_rgba(57,255,20,0.5)]">Weed</h2>
+                    <h2 className="font-bold text-lg mb-2 text-white drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">Weed</h2>
                     <button
                         onClick={() => setSelectionMode("weed")}
-                        className="w-full bg-primary/10 hover:bg-primary hover:text-black text-primary text-sm font-bold py-3 rounded-xl transition-all border border-primary/20 hover:border-primary shadow-[0_0_10px_rgba(57,255,20,0.1)] hover:shadow-[0_0_20px_rgba(57,255,20,0.4)]"
+                        className="w-full glass-btn-primary py-3 hover:scale-[1.02] text-sm"
                     >
                         I feel an impulse
                     </button>
