@@ -6,26 +6,23 @@
   --color-foreground: #FFFFFF;
   /* Crisp White */
 
-  /* Refined Glass System (Pillar 1) */
-  --color-card: rgba(255, 255, 255, 0.03);
-  /* Extremely subtle fill */
+  /* Final Premium Glass System */
+  --color-card: rgba(255, 255, 255, 0.05);
+  /* Slightly more visible glass */
   --color-card-foreground: #FFFFFF;
   --color-border: rgba(255, 255, 255, 0.08);
+  /* Base border */
 
-  /* Semantic Colors (Pillar 2) */
   --color-primary: #10B981;
-  /* Emerald Green Glow */
+  /* Emerald Green */
   --color-primary-foreground: #FFFFFF;
 
   --color-secondary: #38bdf8;
   /* Sky Blue */
-  --color-muted: #9CA3AF;
-  /* gray-400 */
-  --color-muted-foreground: #6B7280;
-  /* gray-500 */
 
   --radius-lg: 1.5rem;
-  --radius-xl: 2rem;
+  --radius-xl: 3rem;
+  /* Apple-style rounded corners */
 }
 
 @layer base {
@@ -41,12 +38,8 @@ body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-inter), sans-serif;
-  /* Pillar 3 */
   overflow-x: hidden;
-  /* Pillar 1: Subtle fixed radial gradients for depth */
-  background-image:
-    radial-gradient(circle at 0% 0%, rgba(16, 185, 129, 0.08), transparent 40%),
-    radial-gradient(circle at 100% 0%, rgba(56, 189, 248, 0.08), transparent 40%);
+  /* Base black background, mesh managed in layout/components */
 }
 
 @keyframes float {
@@ -79,37 +72,38 @@ body {
 
 @layer components {
 
-  /* Pillar 1: Ultra-Minimal Glass + Edge Light */
+  /* Final Premium Glass Card */
   .glass-card {
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: var(--color-card);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-top: 1px solid rgba(255, 255, 255, 0.15);
-    /* Edge Light */
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-    /* Deep Shadow */
+    /* Top Light */
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid transparent;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
     border-radius: 1.5rem;
+    /* Rounded 3xl equiv */
     padding: 1.5rem;
     transition: all 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
   .glass-card:hover {
-    background-color: rgba(255, 255, 255, 0.06);
-    border-top-color: rgba(255, 255, 255, 0.3);
-    /* Enhanced Edge Light on Hover */
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+    background-color: rgba(255, 255, 255, 0.08);
+    border-top-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
   }
 
-  /* Pillar 4: Action-Oriented Buttons */
+  /* Standardized Glass Button */
   .glass-btn-primary {
     position: relative;
     overflow: hidden;
     background: linear-gradient(180deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.05) 100%);
     border: 1px solid rgba(16, 185, 129, 0.2);
     border-top: 1px solid rgba(16, 185, 129, 0.4);
-    /* Edge Light */
     color: #10B981;
     font-weight: 600;
     border-radius: 1rem;
@@ -135,10 +129,10 @@ body {
   }
 
   .glass-btn-secondary {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.6);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.7);
     font-weight: 600;
     border-radius: 1rem;
     backdrop-filter: blur(12px);

@@ -281,42 +281,46 @@ export default function CravingsManager() {
     // 3. DASHBOARD CARDS VIEW (DEFAULT)
     return (
         <>
-            {/* Weed Card */}
-            {/* Weed Card */}
-            {/* Weed Card - Pillar 2: Neon Glow + Pillar 5: Minimalism */}
-            <div className="glass-card flex flex-col justify-between aspect-square group overflow-hidden relative hover:border-t-primary/50 transition-all duration-500">
-                <div className="absolute top-0 right-0 p-3 opacity-30 group-hover:opacity-100 transition-opacity">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_15px_#10B981] animate-pulse"></div>
+            {/* Weed Card: Perfect Symmetry */}
+            <div className="glass-card flex flex-col items-center justify-between aspect-square group overflow-hidden relative hover:border-t-green-500/30 transition-all duration-500 h-full">
+                <div className="flex-1 flex flex-col items-center justify-center w-full relative">
+                    <div className="absolute top-0 right-0 p-3 opacity-30 group-hover:opacity-100 transition-opacity">
+                        <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_15px_#22c55e] animate-pulse"></div>
+                    </div>
+                    <div className="p-5 bg-green-500/10 rounded-full text-green-500 group-hover:scale-110 transition-transform duration-500 backdrop-blur-sm border border-green-500/10 shadow-[0_0_30px_rgba(34,197,94,0.1)] group-hover:shadow-[0_0_60px_rgba(34,197,94,0.3)]">
+                        <Cannabis size={48} className="drop-shadow-[0_0_15px_rgba(34,197,94,0.6)]" />
+                    </div>
                 </div>
 
-                {/* Icon Container with specific drop-shadow glow */}
-                <div className="p-4 w-fit rounded-2xl text-primary group-hover:scale-110 transition-transform duration-500 animate-float backdrop-blur-sm border border-white/5 bg-white/5 shadow-[0_0_30px_rgba(16,185,129,0.1)] group-hover:shadow-[0_0_50px_rgba(16,185,129,0.3)]">
-                    <Cannabis size={40} className="drop-shadow-[0_0_15px_#10B981]" />
-                </div>
-
-                <div>
-                    <h2 className="font-bold text-xl mb-3 text-white">Weed</h2>
+                <div className="w-full">
+                    <h2 className="font-bold text-xl mb-3 text-white text-center">Weed</h2>
                     <button
                         onClick={() => setSelectionMode("weed")}
-                        className="w-full glass-btn-primary py-3.5 hover:scale-[1.02] text-sm tracking-wide shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                        className="w-full glass-btn-primary h-14 text-base tracking-wide shadow-[0_0_20px_rgba(34,197,94,0.2)] justify-center hover:scale-[1.02]"
                     >
                         I feel an impulse
                     </button>
                 </div>
             </div>
 
-            {/* Food Card */}
-            <div className="ghibli-card flex flex-col justify-between aspect-square group">
-                <div className="p-3 bg-secondary/20 w-fit rounded-xl text-secondary-foreground group-hover:scale-110 transition-transform duration-300">
-                    <Utensils size={28} />
+            {/* Food Card: Perfect Symmetry */}
+            <div className="glass-card flex flex-col items-center justify-between aspect-square group overflow-hidden relative hover:border-t-orange-500/30 transition-all duration-500 h-full">
+                <div className="flex-1 flex flex-col items-center justify-center w-full relative">
+                    <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                        <div className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_15px_#F97316] animate-pulse"></div>
+                    </div>
+                    <div className="p-5 bg-orange-500/10 rounded-full text-orange-500 group-hover:scale-110 transition-transform duration-500 backdrop-blur-sm border border-orange-500/10 shadow-[0_0_30px_rgba(249,115,22,0.1)] group-hover:shadow-[0_0_60px_rgba(249,115,22,0.3)]">
+                        <Utensils size={48} className="drop-shadow-[0_0_10px_rgba(249,115,22,0.6)]" />
+                    </div>
                 </div>
-                <div>
-                    <h2 className="font-bold text-lg mb-2 text-secondary-foreground">Food</h2>
+
+                <div className="w-full">
+                    <h2 className="font-bold text-xl mb-3 text-white text-center">Food</h2>
                     <button
-                        onClick={() => setSelectionMode("food")}
-                        className="w-full bg-secondary/20 hover:bg-secondary hover:text-white text-secondary-foreground text-sm font-bold py-3 rounded-xl transition-all"
+                        onClick={() => setSelectionMode(null)}
+                        className="w-full py-4 text-center text-sm font-bold text-white/50 hover:text-white transition-colors mt-4 bg-white/5 rounded-xl hover:bg-white/10"
                     >
-                        New Craving
+                        End Timer & Return
                     </button>
                 </div>
             </div>

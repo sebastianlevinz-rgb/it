@@ -16,8 +16,15 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
 
     return (
         <DigitalDetoxGuard>
-            <main className="min-h-screen pb-24 p-6 flex flex-col font-sans max-w-md mx-auto relative bg-[#000000]">
-                <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_0%,_rgba(16,185,129,0.1)_0%,_rgba(0,0,0,0)_50%)]" />
+            <main className="min-h-screen pb-24 p-6 flex flex-col font-sans max-w-md mx-auto relative bg-[#000000] overflow-hidden">
+                {/* Mesh Gradient Background - Cyan/Emerald Blobs */}
+                <div className="fixed top-[-10%] left-[-20%] w-[500px] h-[500px] bg-cyan-400/20 rounded-full blur-[100px] pointer-events-none mix-blend-screen opacity-40 animate-pulse-slow"></div>
+                <div className="fixed bottom-[-10%] right-[-20%] w-[500px] h-[500px] bg-emerald-500/20 rounded-full blur-[100px] pointer-events-none mix-blend-screen opacity-40 animate-pulse-slow delay-1000"></div>
+
+                {/* Noise Textue */}
+                <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+
+                {/* Breathe Modal */}
                 {showBreathe && <BreatheModal onClose={() => setShowBreathe(false)} />}
 
                 <header className="mb-10 mt-6 flex justify-between items-end relative z-10">
@@ -41,7 +48,7 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
                     </div>
                 </header>
 
-                {/* Breathe Button (Action Entry) - Pillar 4 + 5 */}
+                {/* Breathe Button (Action Entry) */}
                 <button
                     onClick={() => setShowBreathe(true)}
                     className="w-full relative z-10 glass-card mb-8 flex items-center justify-center gap-4 transition-all hover:border-t-primary/50 hover:shadow-[0_10px_40px_rgba(16,185,129,0.15)] group py-6 bg-[linear-gradient(180deg,rgba(255,255,255,0.03)_0%,rgba(255,255,255,0.01)_100%)] hover:bg-[linear-gradient(180deg,rgba(16,185,129,0.1)_0%,rgba(16,185,129,0.02)_100%)]"
@@ -52,8 +59,8 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
                     <span className="font-bold text-xl text-white group-hover:text-primary transition-colors tracking-tight">Take a Breath</span>
                 </button>
 
-                {/* Grid Layout - Pillar 4 (Compact Grid, Large Targets) */}
-                <div className="grid grid-cols-2 gap-5 mb-10 relative z-10">
+                {/* Grid Layout - Strict 2-Column Equal Height */}
+                <div className="grid grid-cols-2 gap-5 mb-10 relative z-10 auto-rows-fr">
 
                     {/* Dynamic Cravings Module handles Weed & Food */}
                     <CravingsManager />
