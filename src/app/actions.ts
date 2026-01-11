@@ -312,7 +312,21 @@ export type InsightsData = {
     agencyScore: number; // % of impulses where delay_start happened vs total impulses
     triggerDistribution: { category: string; count: number }[]; // Enhancement vs Avoidance
     fastingAverage: number; // hours
+    aiVibeCheck: string; // The "Friendly AI Insight"
 };
+
+export async function addXP(amount: number) {
+    await ensureUser();
+
+    await prisma.user.update({
+        where: { id: DEMO_USER_ID },
+        data: {
+            agency_points: { increment: amount }
+        }
+    });
+
+    revalidatePath("/");
+}
 
 export async function getInsightsData(): Promise<InsightsData> {
     await ensureUser();
@@ -401,12 +415,37 @@ export async function getInsightsData(): Promise<InsightsData> {
 
     const fastingAverage = fastingSessions > 0 ? parseFloat((totalFastingHours / fastingSessions).toFixed(1)) : 0;
 
+    // 5. AI Vibe Check (Heuristic)
+    let aiVibeCheck = "Gathering more data to read your vibe...";
+
+    if (impulseEvents.length > 5) {
+        // Simple heuristic: correlation between trigger and agency
+        // For each trigger, what % ended in 'resisted'?
+        // (This is computationally heavy for a real app but fine for MVP)
+
+        // Find best ritual (trigger that leads to highest resistance)
+        // ... (Simplified for speed) 
+        if (agencyScore > 70) {
+            aiVibeCheck = `You're crushing it! Your Agency Score is ${agencyScore}%. You seem to thrive when you acknowledge the impulse but choose not to act.`;
+        } else if (topTriggers.length > 0) {
+            const topTrigger = topTriggers[0].trigger;
+            aiVibeCheck = `Vibe Check: "${topTrigger}" is your most frequent visitor. Try the 4-7-8 breathing technique next time it knocks.`;
+        }
+
+        // Time based insight
+        const topHour = peakHours.reduce((a, b) => a.count > b.count ? a : b);
+        if (topHour.count > 2) {
+            aiVibeCheck += ` Watch out around ${topHour.hour}:00 - that's when the cravings tend to spike!`;
+        }
+    }
+
     return {
         topTriggers,
         peakHours,
         agencyScore,
         triggerDistribution,
         fastingAverage,
+        aiVibeCheck
     };
 }
 

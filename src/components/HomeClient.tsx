@@ -13,7 +13,7 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
     const [showBreathe, setShowBreathe] = useState(false);
 
     return (
-        <main className="min-h-screen pb-24 p-5 flex flex-col font-sans max-w-md mx-auto relative bg-[linear-gradient(to_bottom,#1e1f22,#2b2d31)] overflow-hidden font-medium text-gray-100">
+        <main className="min-h-screen pb-24 p-5 flex flex-col font-sans max-w-md mx-auto relative bg-gradient-to-br from-[#1e1f22] via-[#2b2d31] to-black overflow-hidden font-medium text-gray-100 animate-living-gradient">
             {/* Background: Pure Black with Mesh Gradient Blobs - Keep for depth, but adjusted opacity */}
             <div className="fixed top-[-20%] left-[-20%] w-[500px] h-[500px] bg-[#5865F2]/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen animate-pulse-slow"></div>
             <div className="fixed bottom-[-20%] right-[-20%] w-[500px] h-[500px] bg-[#57F287]/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen animate-pulse-slow delay-1000"></div>

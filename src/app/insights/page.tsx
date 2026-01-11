@@ -1,136 +1,61 @@
-"use client";
+import { getInsightsData } from "@/app/actions";
+import { ShieldCheck, Zap, Brain, Activity } from "lucide-react";
+import Link from "next/link";
 
-import { Leaf, Award, Timer, TrendingUp, BarChart as BarIcon, ShieldCheck } from "lucide-react";
-import { useEffect, useState } from "react";
-import { getInsightsData, type InsightsData } from "@/app/actions";
-import BottomNav from "@/components/BottomNav";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from "recharts";
-
-const COLORS = {
-    moonlight: "#e2e8f0",
-    star: "#fde047",
-    moss: "#4ade80",
-    midnight: "#1e293b",
-    transparent: "rgba(255,255,255,0.1)"
-};
-
-export default function InsightsPage() {
-    const [data, setData] = useState<InsightsData | null>(null);
-
-    useEffect(() => {
-        getInsightsData().then(setData);
-    }, []);
-
-    if (!data) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center text-[#94a3b8] animate-pulse">Aligning stars...</div>;
-
-    const isEmpty = data.agencyScore === 0 && data.topTriggers.length === 0;
+export default async function InsightsPage() {
+    const data = await getInsightsData();
 
     return (
-        <main className="min-h-screen pb-24 p-6 bg-gradient-to-b from-[#0f172a] to-[#064e3b] bg-noise text-[#e2e8f0]">
-            <header className="mb-10 mt-4 z-content">
-                <h1 className="text-3xl font-serif font-bold tracking-tight text-[#f1f5f9] drop-shadow-md">Insights</h1>
-                <p className="text-[#94a3b8] text-sm font-serif italic opacity-80 mt-1">Patterns from the night sky.</p>
+        <main className="min-h-screen pb-24 p-5 flex flex-col font-sans max-w-md mx-auto relative bg-gradient-to-br from-[#1e1f22] via-[#2b2d31] to-black overflow-hidden font-medium text-gray-100 animate-living-gradient">
+            {/* Header */}
+            <header className="mb-8 mt-6 flex justify-between items-center relative z-10">
+                <h1 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">Insights</h1>
+                <Link href="/" className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
+                    <span className="text-sm font-bold px-2">Back</span>
+                </Link>
             </header>
 
-            {isEmpty ? (
-                <div className="flex flex-col items-center justify-center h-[50vh] text-center z-content">
-                    <div className="mb-6 relative">
-                        <div className="absolute inset-0 bg-yellow-400/20 blur-xl rounded-full animate-pulse" />
-                        <ShieldCheck size={48} className="text-[#fde047]/80 relative z-10" />
+            <div className="space-y-6 relative z-10">
+                {/* AI Vibe Check Card */}
+                <div className="bg-[#5865F2] rounded-[32px] p-6 shadow-[0_0_40px_rgba(88,101,242,0.3)] animate-float">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 bg-white/20 rounded-full">
+                            <Brain size={24} className="text-white" />
+                        </div>
+                        <h2 className="font-bold text-white text-lg">AI Vibe Check</h2>
                     </div>
-                    <p className="text-[#e2e8f0] font-serif text-lg max-w-xs leading-relaxed opacity-90">
-                        The stars are still aligning. <br />
-                        Keep logging your impulses to see your patterns emerge.
+                    <p className="text-white/90 text-lg font-medium leading-relaxed">
+                        "{data.aiVibeCheck}"
                     </p>
                 </div>
-            ) : (
-                <div className="space-y-8 z-content">
 
-                    {/* Agency Score (Pie) */}
-                    <div className="bg-[#0f172a]/40 backdrop-blur-md rounded-2xl p-6 border border-[#e2e8f0]/10 shadow-xl">
-                        <h2 className="text-[#a5b4fc] font-serif font-medium mb-6 flex items-center gap-2">
-                            <Award size={18} /> Agency Score
-                        </h2>
-                        <div className="h-48 relative flex items-center justify-center">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={[{ name: 'Agency', value: data.agencyScore }, { name: 'Impulse', value: 100 - data.agencyScore }]}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={80}
-                                        startAngle={90}
-                                        endAngle={-270}
-                                        dataKey="value"
-                                        stroke="none"
-                                    >
-                                        <Cell fill={COLORS.moss} />
-                                        <Cell fill={COLORS.transparent} />
-                                    </Pie>
-                                </PieChart>
-                            </ResponsiveContainer>
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-3xl font-bold font-numeric text-[#f0fdf4] drop-shadow-lg">{data.agencyScore}%</span>
-                            </div>
-                        </div>
-                        <p className="text-center text-xs text-[#94a3b8] mt-2 font-serif italic">Resisted impulses vs. consumed.</p>
+                {/* Agency Score Card */}
+                <div className="bg-[#2b2d31] rounded-[32px] p-6 border border-white/5 shadow-xl">
+                    <div className="flex justify-between items-start mb-2">
+                        <span className="text-gray-400 font-bold uppercase text-xs tracking-wider">Weekly Agency</span>
+                        <ShieldCheck className="text-[#57F287]" />
                     </div>
-
-                    {/* Trigger Distribution (Bar) */}
-                    <div className="bg-[#0f172a]/40 backdrop-blur-md rounded-2xl p-6 border border-[#e2e8f0]/10 shadow-xl">
-                        <h2 className="text-[#fde047] font-serif font-medium mb-6 flex items-center gap-2">
-                            <TrendingUp size={18} /> Trigger Nature
-                        </h2>
-                        <div className="h-48">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={data.triggerDistribution} layout="vertical" margin={{ left: 0 }}>
-                                    <XAxis type="number" hide />
-                                    <YAxis dataKey="category" type="category" width={100} tick={{ fill: '#e2e8f0', fontSize: 12, fontFamily: 'serif' }} axisLine={false} tickLine={false} />
-                                    <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#e2e8f0' }} />
-                                    <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={24}>
-                                        <Cell fill="#60a5fa" /> {/* Enhancement */}
-                                        <Cell fill="#f87171" /> {/* Avoidance */}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
+                    <div className="text-5xl font-black text-white mb-2">
+                        {data.agencyScore}%
                     </div>
-
-                    {/* Peak Hours (Bar) */}
-                    <div className="bg-[#0f172a]/40 backdrop-blur-md rounded-2xl p-6 border border-[#e2e8f0]/10 shadow-xl">
-                        <h2 className="text-[#fb923c] font-serif font-medium mb-6 flex items-center gap-2">
-                            <BarIcon size={18} /> Peak Hours
-                        </h2>
-                        <div className="h-48">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={data.peakHours}>
-                                    <XAxis dataKey="hour" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} interval={3} />
-                                    <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#e2e8f0' }} />
-                                    <Bar dataKey="count" radius={[4, 4, 0, 0]} fill="#fb923c" opacity={0.8} />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
-
-                    {/* Fasting (Simple Card) */}
-                    <div className="bg-[#0f172a]/40 backdrop-blur-md rounded-2xl p-6 border border-[#e2e8f0]/10 shadow-xl flex items-center justify-between">
-                        <div>
-                            <h2 className="text-[#38bdf8] font-serif font-medium mb-1 flex items-center gap-2">
-                                <Timer size={18} /> Fasting Avg
-                            </h2>
-                            <p className="text-xs text-[#94a3b8]">Average duration per session</p>
-                        </div>
-                        <div className="text-right">
-                            <span className="text-3xl font-bold font-numeric text-[#e0f2fe]">{data.fastingAverage}</span>
-                            <span className="text-sm text-[#bae6fd] ml-1">hrs</span>
-                        </div>
-                    </div>
-
+                    <p className="text-gray-500 text-sm">of impulses resisted</p>
                 </div>
-            )}
 
-            <BottomNav />
+                {/* Top Trigger */}
+                <div className="bg-[#2b2d31] rounded-[32px] p-6 border border-white/5 shadow-xl">
+                    <div className="flex justify-between items-start mb-2">
+                        <span className="text-gray-400 font-bold uppercase text-xs tracking-wider">Top Trigger</span>
+                        <Activity className="text-[#FEE75C]" />
+                    </div>
+                    <div className="text-3xl font-black text-white mb-1">
+                        {data.topTriggers[0]?.trigger || "None"}
+                    </div>
+                    <p className="text-gray-500 text-sm">is pushing your buttons</p>
+                </div>
+
+                {/* Fasting Stat (Legacy/Hidden or repurposed) */}
+                {/* Keeping it simple for now as requested */}
+            </div>
         </main>
     );
 }

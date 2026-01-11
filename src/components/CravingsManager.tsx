@@ -2,7 +2,7 @@
 
 import { Leaf, Utensils, X, Clock, CheckCircle, AlertCircle, Play, Cannabis } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
-import { logImpulse, getActiveImpulseState, logOutcome, type TriggerPayload, type ActiveState } from "@/app/actions";
+import { logImpulse, getActiveImpulseState, logOutcome, addXP, type TriggerPayload, type ActiveState } from "@/app/actions";
 
 const TRIGGERS_ENHANCEMENT = ["Music", "Movies", "Gaming", "Age of Empires", "Socializing", "Sex", "Creativity", "Nature", "Chocolate"];
 const TRIGGERS_AVOIDANCE = ["Boredom", "Stress", "Anxiety", "Sadness", "Loneliness", "Tiredness", "Procrastination", "Late-night Snacking"];
@@ -83,6 +83,8 @@ export default function CravingsManager() {
         if (!activeState.eventId) return;
         setIsSubmitting(true);
         await logOutcome(activeState.eventId, outcome);
+        // Logic: You logged the outcome honestly. Award XP.
+        await addXP(5);
         setActiveState({ isActive: false });
         setIsSubmitting(false);
     };
@@ -103,11 +105,15 @@ export default function CravingsManager() {
 
         return (
             <div className="col-span-2 ghibli-card flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden bg-white/50 border-primary/10">
-                {/* Progress Background */}
-                <div
-                    className="absolute bottom-0 left-0 h-1 bg-primary/30 transition-all duration-1000"
-                    style={{ width: `${percent}%` }}
-                />
+                {/* Juicy Squishy Progress Bar */}
+                <div className="absolute bottom-6 left-6 right-6 h-4 bg-black/20 rounded-full overflow-hidden blur-[0.5px]">
+                    <div
+                        className="h-full bg-[#57F287] rounded-full transition-all duration-1000 ease-in-out shadow-[0_0_15px_#57F287] animate-pulse relative"
+                        style={{ width: `${percent}%` }}
+                    >
+                        <div className="absolute top-0 right-0 bottom-0 w-2 bg-white/50 blur-[2px]"></div>
+                    </div>
+                </div>
 
                 <div className="text-center z-10 w-full max-w-md">
                     {!isReady ? (
@@ -127,9 +133,13 @@ export default function CravingsManager() {
                                 <p>Observe the craving. Does it change?</p>
 
                                 <button
-                                    onClick={() => {
+                                    onClick={async () => {
+                                        // End Timer Early logic
                                         setActiveState({ isActive: false });
                                         setSelectionMode(null);
+                                        // Award XP for mindfulness if they waited at least a bit? 
+                                        // For now, let's say manually ending it triggers mindfulness check (+10)
+                                        await addXP(10);
                                     }}
                                     className="text-xs text-red-400 hover:text-red-500 transition-colors mt-8 underline decoration-dotted"
                                 >
