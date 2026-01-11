@@ -4,6 +4,8 @@ import { Leaf, Utensils, X, Clock, CheckCircle, AlertCircle, Play, Cannabis } fr
 import { useState, useEffect, useCallback, useRef } from "react";
 import { logImpulse, getActiveImpulseState, logOutcome, addXP, type TriggerPayload, type ActiveState } from "@/app/actions";
 import confetti from "canvas-confetti";
+import SmokeEffect from "@/components/effects/SmokeEffect";
+import CrumbEffect from "@/components/effects/CrumbEffect";
 
 const TRIGGERS_ENHANCEMENT = ["Music", "Movies", "Gaming", "Age of Empires", "Socializing", "Sex", "Creativity", "Nature", "Chocolate"];
 const TRIGGERS_AVOIDANCE = ["Boredom", "Stress", "Anxiety", "Sadness", "Loneliness", "Tiredness", "Procrastination", "Late-night Snacking"];
@@ -154,6 +156,10 @@ export default function CravingsManager() {
 
         return (
             <div className={wrapperClass}>
+                {/* Particle Overlays */}
+                {failureEffect === "smoke" && <SmokeEffect />}
+                {failureEffect === "crumble" && <CrumbEffect />}
+
                 {failureEffect && (
                     <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
                         <h2 className="text-2xl font-bold text-white drop-shadow-md">
