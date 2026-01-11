@@ -4,8 +4,6 @@ import { Leaf, Utensils, X, Clock, CheckCircle, AlertCircle, Play, Cannabis } fr
 import { useState, useEffect, useCallback, useRef } from "react";
 import { logImpulse, getActiveImpulseState, logOutcome, addXP, type TriggerPayload, type ActiveState } from "@/app/actions";
 import confetti from "canvas-confetti";
-import SmokeEffect from "@/components/effects/SmokeEffect";
-import CrumbEffect from "@/components/effects/CrumbEffect";
 
 const TRIGGERS_ENHANCEMENT = ["Music", "Movies", "Gaming", "Age of Empires", "Socializing", "Sex", "Creativity", "Nature", "Chocolate"];
 const TRIGGERS_AVOIDANCE = ["Boredom", "Stress", "Anxiety", "Sadness", "Loneliness", "Tiredness", "Procrastination", "Late-night Snacking"];
@@ -23,7 +21,7 @@ export default function CravingsManager() {
 
     // Timer State
     const [timeLeft, setTimeLeft] = useState<number | null>(null);
-    const [failureEffect, setFailureEffect] = useState<"smoke" | "crumble" | null>(null);
+    const [isGhosting, setIsGhosting] = useState(false);
     const timerInterval = useRef<NodeJS.Timeout | null>(null);
 
     // Load initial state
@@ -85,20 +83,19 @@ export default function CravingsManager() {
         // 1. Stop Timer
         if (timerInterval.current) clearInterval(timerInterval.current);
 
-        // 2. Determine Effect
-        const type = activeState.payload?.type;
-        setFailureEffect(type === "weed" ? "smoke" : "crumble");
+        // 2. Determine Effect (Already handled by isGhosting)
+        // const type = activeState.payload?.type;
 
         // 3. Log Failure & Award Partial XP
-        await logOutcome(activeState.eventId, "consumed"); // "give_in" mapped to consumed for schema simplicity or update schema later
-        await addXP(5); // Honest logging
+        await logOutcome(activeState.eventId, "consumed");
+        await addXP(5);
 
         // 4. Delay reset to show animation
         setTimeout(() => {
             setActiveState({ isActive: false });
             setSelectionMode(null);
-            setFailureEffect(null);
-        }, 1500);
+            setIsGhosting(false);
+        }, 600);
     };
 
     const handleStartImpulse = async () => {
@@ -150,21 +147,14 @@ export default function CravingsManager() {
 
         // Animation Wrapper Classes
         const wrapperClass = `col-span-2 ghibli-card flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden bg-white/50 border-primary/10 transition-all duration-500
-            ${failureEffect === "smoke" ? "animate-smoke grayscale" : ""}
-            ${failureEffect === "crumble" ? "animate-crumble" : ""}
+            ${isGhosting ? "ghost-out" : ""}
         `;
 
         return (
             <div className={wrapperClass}>
-                {/* Particle Overlays */}
-                {failureEffect === "smoke" && <SmokeEffect />}
-                {failureEffect === "crumble" && <CrumbEffect />}
-
-                {failureEffect && (
+                {isGhosting && (
                     <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
-                        <h2 className="text-2xl font-bold text-white drop-shadow-md">
-                            {failureEffect === "smoke" ? "The smoke clears..." : "A small bite..."}
-                        </h2>
+                        {/* Ghosting doesn't need text, it just vanishes */}
                     </div>
                 )}
                 {/* Juicy Squishy Progress Bar */}
