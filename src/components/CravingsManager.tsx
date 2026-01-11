@@ -99,13 +99,16 @@ export default function CravingsManager() {
     };
 
     const handleStartImpulse = async () => {
-        if (!selectionMode || !category || !specificTrigger) return;
+        if (!selectionMode) return;
+        // For food, we don't need category/trigger. For weed, we do.
+        if (selectionMode === "weed" && (!category || !specificTrigger)) return;
+
         setIsSubmitting(true);
 
         const payload: TriggerPayload = {
             type: selectionMode,
-            category,
-            specificTrigger,
+            category: selectionMode === "food" ? "enhancement" : category!,
+            specificTrigger: selectionMode === "food" ? "Hunger" : specificTrigger!,
             foodDetails: selectionMode === "food" ? { hungerLevel, description: foodDesc } : undefined,
         };
 
@@ -228,105 +231,116 @@ export default function CravingsManager() {
         const isFood = selectionMode === "food";
 
         return (
-            <div className="col-span-2 bg-card rounded-xl p-4 border border-muted">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold capitalize flex items-center gap-2">
-                        {isFood ? <Utensils size={20} className="text-orange-400" /> : <Leaf size={20} className="text-primary" />}
+            <div className="col-span-2 bg-[#2b2d31]/95 backdrop-blur-xl rounded-[32px] p-6 border border-white/5 animate-in fade-in zoom-in-95 duration-300">
+                <div className="flex items-center justify-between mb-8">
+                    <h2 className="text-xl font-bold capitalize flex items-center gap-3 text-white">
+                        {isFood ? <Utensils size={24} className="text-[#FEE75C]" /> : <Leaf size={24} className="text-[#57F287]" />}
                         New {selectionMode} Craving
                     </h2>
-                    <button onClick={() => setSelectionMode(null)} className="p-2 hover:bg-zinc-800 rounded-full">
+                    <button onClick={() => setSelectionMode(null)} className="p-2 hover:bg-white/10 rounded-full text-zinc-400 hover:text-white transition-colors">
                         <X size={20} />
                     </button>
                 </div>
 
-                <div className="space-y-6">
-                    {/* Category */}
-                    <div>
-                        <label className="block text-sm text-gray-500 mb-2">Category</label>
-                        <div className="grid grid-cols-2 gap-3">
-                            <button
-                                onClick={() => setCategory("enhancement")}
-                                className={`p-3 rounded-lg border text-left transition-all ${category === "enhancement"
-                                    ? "border-primary bg-primary/10 text-primary"
-                                    : "border-muted hover:border-gray-600"
-                                    }`}
-                            >
-                                <span className="block font-medium mb-1">Enhancement</span>
-                                <span className="text-xs opacity-70">To make things better (Music, Ritual)</span>
-                            </button>
-                            <button
-                                onClick={() => setCategory("avoidance")}
-                                className={`p-3 rounded-lg border text-left transition-all ${category === "avoidance"
-                                    ? "border-primary bg-primary/10 text-primary"
-                                    : "border-muted hover:border-gray-600"
-                                    }`}
-                            >
-                                <span className="block font-medium mb-1">Avoidance</span>
-                                <span className="text-xs opacity-70">To escape feelings (Stress, Boredom)</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Specific Triggers */}
-                    {category && (
-                        <div className="animate-in fade-in slide-in-from-top-2">
-                            <label className="block text-sm text-gray-500 mb-2">Specific Trigger</label>
-                            <div className="flex flex-wrap gap-2">
-                                {(category === "enhancement" ? TRIGGERS_ENHANCEMENT : TRIGGERS_AVOIDANCE).map(t => (
-                                    <button
-                                        key={t}
-                                        onClick={() => setSpecificTrigger(t)}
-                                        className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${specificTrigger === t
-                                            ? "bg-white text-black border-white"
-                                            : "border-gray-700 text-gray-300 hover:border-gray-500"
-                                            }`}
-                                    >
-                                        {t}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Food Extras */}
-                    {isFood && (
-                        <div className="space-y-4 pt-4 border-t border-muted animate-in fade-in">
-                            <div>
-                                <label className="block text-sm text-gray-500 mb-2">Hunger Level (1-5)</label>
+                <div className="space-y-8">
+                    {/* CUSTOM FOOD FLOW - HUNGER METER */}
+                    {isFood ? (
+                        <div className="animate-in fade-in slide-in-from-bottom-2">
+                            <div className="mb-8">
+                                <label className="flex justify-between text-sm font-bold text-gray-400 mb-4">
+                                    <span>Hunger Level</span>
+                                    <span className="text-[#FEE75C]">{hungerLevel} - {hungerLevel === 1 ? "Just a taste" : hungerLevel >= 8 ? "Starving" : "Hungry"}</span>
+                                </label>
                                 <input
                                     type="range"
                                     min="1"
-                                    max="5"
+                                    max="10"
                                     value={hungerLevel}
                                     onChange={(e) => setHungerLevel(parseInt(e.target.value))}
-                                    className="w-full accent-primary h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                                    className="w-full accent-[#FEE75C] h-2 bg-black/40 rounded-lg appearance-none cursor-pointer"
                                 />
-                                <div className="flex justify-between text-xs text-gray-500 mt-1">
-                                    <span>Not Hungry</span>
+                                <div className="flex justify-between text-[10px] text-gray-500 mt-2 font-mono uppercase tracking-wider">
+                                    <span>Just a taste</span>
                                     <span>Starving</span>
                                 </div>
                             </div>
+
                             <div>
-                                <label className="block text-sm text-gray-500 mb-2">What are you craving?</label>
+                                <label className="block text-sm font-bold text-gray-400 mb-3">What are you craving?</label>
                                 <input
                                     type="text"
                                     value={foodDesc}
                                     onChange={(e) => setFoodDesc(e.target.value)}
                                     placeholder="e.g. Pizza, Chocolate..."
-                                    className="w-full bg-zinc-900 border border-muted rounded-lg p-3 text-sm focus:border-primary focus:outline-none"
+                                    className="w-full bg-black/20 border border-white/5 rounded-xl p-4 text-white placeholder-zinc-600 focus:border-[#FEE75C]/50 focus:outline-none transition-colors"
                                 />
                             </div>
                         </div>
+                    ) : (
+                        /* WEED FLOW - STANDARD CATEGORIES */
+                        <>
+                            {/* Category */}
+                            <div>
+                                <label className="block text-sm font-bold text-gray-400 mb-3">Category</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button
+                                        onClick={() => setCategory("enhancement")}
+                                        className={`p-4 rounded-2xl border text-left transition-all ${category === "enhancement"
+                                            ? "border-[#57F287] bg-[#57F287]/10 text-[#57F287]"
+                                            : "border-white/5 bg-black/20 hover:bg-white/5 text-zinc-400"
+                                            }`}
+                                    >
+                                        <span className="block font-bold mb-1">Enhancement</span>
+                                        <span className="text-xs opacity-70 leading-tight">To make things better (Music, Ritual)</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setCategory("avoidance")}
+                                        className={`p-4 rounded-2xl border text-left transition-all ${category === "avoidance"
+                                            ? "border-[#57F287] bg-[#57F287]/10 text-[#57F287]"
+                                            : "border-white/5 bg-black/20 hover:bg-white/5 text-zinc-400"
+                                            }`}
+                                    >
+                                        <span className="block font-bold mb-1">Avoidance</span>
+                                        <span className="text-xs opacity-70 leading-tight">To escape feelings (Stress, Boredom)</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Specific Triggers */}
+                            {category && (
+                                <div className="animate-in fade-in slide-in-from-top-2">
+                                    <label className="block text-sm font-bold text-gray-400 mb-3">Specific Trigger</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {(category === "enhancement" ? TRIGGERS_ENHANCEMENT : TRIGGERS_AVOIDANCE).map(t => (
+                                            <button
+                                                key={t}
+                                                onClick={() => setSpecificTrigger(t)}
+                                                className={`px-4 py-2 rounded-full text-xs font-bold border transition-all ${specificTrigger === t
+                                                    ? "bg-[#57F287] text-black border-[#57F287]"
+                                                    : "border-white/10 bg-black/20 text-zinc-400 hover:border-white/20"
+                                                    }`}
+                                            >
+                                                {t}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     )}
 
                     {/* Submit */}
                     <button
-                        disabled={!category || !specificTrigger || isSubmitting}
+                        disabled={isFood ? isSubmitting : (!category || !specificTrigger || isSubmitting)}
                         onClick={handleStartImpulse}
-                        className="w-full bg-primary hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold py-4 rounded-xl transition-all mt-4 flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(57,255,20,0.4)]"
+                        className={`w-full font-bold py-5 rounded-[24px] transition-all mt-6 flex items-center justify-center gap-2 shadow-lg active-squish
+                            ${isFood
+                                ? "bg-[#FEE75C] hover:bg-[#eacb35] text-black shadow-[0_0_20px_rgba(254,231,92,0.3)]"
+                                : "bg-[#57F287] hover:bg-[#4ce279] disabled:opacity-50 disabled:cursor-not-allowed text-black shadow-[0_0_20px_rgba(87,242,135,0.3)]"
+                            }`}
                     >
                         {isSubmitting ? "Starting..." : "Start 20m Timer"}
-                        <Play size={18} fill="currentColor" />
+                        <Play size={20} fill="currentColor" />
                     </button>
 
                 </div>
@@ -338,7 +352,7 @@ export default function CravingsManager() {
     return (
         <div className="grid grid-cols-2 gap-5 w-full">
             {/* Weed Island - Staggered Float & Breathe */}
-            <div className="animate-float-gentle" style={{ animationDelay: '0.5s' }}>
+            <div className="animate-float-gentle" style={{ animationDelay: '0.3s' }}>
                 <div className="rounded-[32px] bg-[#2b2d31]/80 backdrop-blur-xl flex flex-col items-center justify-center gap-3 group overflow-hidden relative transition-all duration-300 w-full aspect-square border border-white/5 p-4 active-squish cursor-pointer animate-breathe-glow"
                     onClick={() => setSelectionMode("weed")}>
 
@@ -351,7 +365,7 @@ export default function CravingsManager() {
             </div>
 
             {/* Food Island - Staggered Float & Breathe */}
-            <div className="animate-float-gentle" style={{ animationDelay: '1.0s' }}>
+            <div className="animate-float-gentle" style={{ animationDelay: '0.6s' }}>
                 <div className="rounded-[32px] bg-[#2b2d31]/80 backdrop-blur-xl flex flex-col items-center justify-center gap-3 group overflow-hidden relative transition-all duration-300 w-full aspect-square border border-white/5 p-4 active-squish cursor-pointer animate-breathe-glow"
                     style={{ animationDelay: '2s' }}
                     onClick={() => setSelectionMode("food")}>
