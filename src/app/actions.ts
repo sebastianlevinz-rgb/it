@@ -328,6 +328,15 @@ export async function addXP(amount: number) {
     revalidatePath("/");
 }
 
+export async function getUserXP() {
+    await ensureUser();
+    const user = await prisma.user.findUnique({
+        where: { id: DEMO_USER_ID },
+        select: { agency_points: true }
+    });
+    return user?.agency_points || 0;
+}
+
 export async function getInsightsData(): Promise<InsightsData> {
     await ensureUser();
     const thirtyDaysAgo = new Date();

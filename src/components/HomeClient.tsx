@@ -6,11 +6,20 @@ import CravingsManager from "@/components/CravingsManager";
 
 import BottomNav from "@/components/BottomNav";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BreatheModal from "@/components/BreatheModal";
+import { getUserXP } from "@/app/actions";
+import { getLevelInfo, type LevelInfo } from "@/utils/xp";
 
 export default function HomeClient({ agencyScore }: { agencyScore: number | null }) {
     const [showBreathe, setShowBreathe] = useState(false);
+    const [levelInfo, setLevelInfo] = useState<LevelInfo | null>(null);
+
+    useEffect(() => {
+        getUserXP().then(xp => {
+            setLevelInfo(getLevelInfo(xp));
+        });
+    }, []);
 
     return (
         <main className="min-h-screen pb-24 p-5 flex flex-col font-sans max-w-md mx-auto relative bg-gradient-to-br from-[#1e1f22] via-[#2b2d31] to-black overflow-hidden font-medium text-gray-100 animate-living-gradient">
@@ -24,25 +33,35 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
             {/* Breathe Modal */}
             {showBreathe && <BreatheModal onClose={() => setShowBreathe(false)} />}
 
-            <header className="mb-8 mt-6 flex justify-between items-center relative z-10">
-                <div>
-                    <h1 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">Craving App</h1>
-                    <p className="text-[#B5BAC1] text-sm font-semibold mt-1">What's the vibe today?</p>
-                </div>
-                <div className="flex items-center gap-4">
-                    {agencyScore !== null && (
-                        <div className="flex flex-col items-end">
-                            <span className="text-[10px] text-[#B5BAC1] uppercase tracking-widest font-bold mb-1">Agency</span>
-                            <div className="flex items-center gap-1.5 text-[#5865F2] drop-shadow-md">
-                                <ShieldCheck size={20} fill="currentColor" strokeWidth={2.5} />
-                                <span className="font-extrabold text-2xl">{agencyScore}%</span>
-                            </div>
-                        </div>
-                    )}
+            <header className="mb-8 mt-6 flex flex-col gap-4 relative z-10">
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h1 className="text-4xl font-black tracking-tighter text-white drop-shadow-sm uppercase">Impulse</h1>
+                        <p className="text-[#B5BAC1] text-sm font-semibold tracking-wide">The power of the gap</p>
+                    </div>
                     <Link href="/settings" className="p-3 hover:bg-white/10 rounded-full text-[#B5BAC1] hover:text-white transition-colors active-squish">
                         <Settings size={24} strokeWidth={2.5} />
                     </Link>
                 </div>
+
+                {/* XP Bar */}
+                {levelInfo && (
+                    <div className="bg-[#111214] rounded-2xl p-4 border border-white/5 shadow-inner">
+                        <div className="flex justify-between items-end mb-2">
+                            <div>
+                                <span className="text-xs font-bold text-[#5865F2] uppercase tracking-wider">Level {levelInfo.level}</span>
+                                <h3 className="text-white font-bold text-lg leading-none">{levelInfo.title}</h3>
+                            </div>
+                            <span className="text-xs text-gray-500 font-mono">{levelInfo.currentXP} / {levelInfo.nextThreshold} XP</span>
+                        </div>
+                        <div className="h-2 w-full bg-[#2b2d31] rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-[#5865F2] shadow-[0_0_10px_#5865F2]"
+                                style={{ width: `${levelInfo.progressPercent}%`, transition: 'width 1s ease-out' }}
+                            />
+                        </div>
+                    </div>
+                )}
             </header>
 
             {/* Breathe Button (Action Entry) */}

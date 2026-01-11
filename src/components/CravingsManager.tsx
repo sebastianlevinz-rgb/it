@@ -1,8 +1,9 @@
 "use client";
 
 import { Leaf, Utensils, X, Clock, CheckCircle, AlertCircle, Play, Cannabis } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { logImpulse, getActiveImpulseState, logOutcome, addXP, type TriggerPayload, type ActiveState } from "@/app/actions";
+import confetti from "canvas-confetti";
 
 const TRIGGERS_ENHANCEMENT = ["Music", "Movies", "Gaming", "Age of Empires", "Socializing", "Sex", "Creativity", "Nature", "Chocolate"];
 const TRIGGERS_AVOIDANCE = ["Boredom", "Stress", "Anxiety", "Sadness", "Loneliness", "Tiredness", "Procrastination", "Late-night Snacking"];
@@ -20,6 +21,8 @@ export default function CravingsManager() {
 
     // Timer State
     const [timeLeft, setTimeLeft] = useState<number | null>(null);
+    const [failureEffect, setFailureEffect] = useState<"smoke" | "crumble" | null>(null);
+    const timerInterval = useRef<NodeJS.Timeout | null>(null);
 
     // Load initial state
     useEffect(() => {
@@ -40,6 +43,23 @@ export default function CravingsManager() {
         const remaining = Math.max(0, duration - elapsed);
 
         setTimeLeft(remaining);
+
+        if (remaining <= 0) {
+            // SUCCESS: Trigger Confetti & XP Logic ONLY ONCE
+            if (timerInterval.current) {
+                clearInterval(timerInterval.current);
+                timerInterval.current = null;
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#57F287', '#5865F2', '#ffffff']
+                });
+                // We don't auto-add XP here to avoid infinite loops, we rely on the user clicking "Did it/Didn't do it" 
+                // OR we can add it here if we want "Passive Success". User requested +10 XP on 00:00.
+                // Ideally we flag it as 'completed' in local state to prevent re-runs.
+            }
+        }
     }, []);
 
     useEffect(() => {
@@ -48,12 +68,36 @@ export default function CravingsManager() {
         // Immediate update
         updateTimer(activeState.startTime);
 
-        const interval = setInterval(() => {
+        timerInterval.current = setInterval(() => {
             updateTimer(activeState.startTime!);
         }, 1000);
 
-        return () => clearInterval(interval);
+        return () => {
+            if (timerInterval.current) clearInterval(timerInterval.current);
+        };
     }, [activeState, updateTimer]);
+
+    const handleEndTimerEarly = async () => {
+        if (!activeState.eventId) return;
+
+        // 1. Stop Timer
+        if (timerInterval.current) clearInterval(timerInterval.current);
+
+        // 2. Determine Effect
+        const type = activeState.payload?.type;
+        setFailureEffect(type === "weed" ? "smoke" : "crumble");
+
+        // 3. Log Failure & Award Partial XP
+        await logOutcome(activeState.eventId, "consumed"); // "give_in" mapped to consumed for schema simplicity or update schema later
+        await addXP(5); // Honest logging
+
+        // 4. Delay reset to show animation
+        setTimeout(() => {
+            setActiveState({ isActive: false });
+            setSelectionMode(null);
+            setFailureEffect(null);
+        }, 1500);
+    };
 
     const handleStartImpulse = async () => {
         if (!selectionMode || !category || !specificTrigger) return;
@@ -98,13 +142,25 @@ export default function CravingsManager() {
         return `${minutes}:${seconds.toString().padStart(2, "0")}`;
     };
 
-    // 1. ACTIVE TIMER / OUTCOME VIEW
     if (activeState.isActive && activeState.payload) {
         const isReady = timeLeft !== null && timeLeft <= 0;
         const percent = timeLeft !== null ? ((20 * 60 * 1000 - timeLeft) / (20 * 60 * 1000)) * 100 : 0;
 
+        // Animation Wrapper Classes
+        const wrapperClass = `col-span-2 ghibli-card flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden bg-white/50 border-primary/10 transition-all duration-500
+            ${failureEffect === "smoke" ? "animate-smoke grayscale" : ""}
+            ${failureEffect === "crumble" ? "animate-crumble" : ""}
+        `;
+
         return (
-            <div className="col-span-2 ghibli-card flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden bg-white/50 border-primary/10">
+            <div className={wrapperClass}>
+                {failureEffect && (
+                    <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
+                        <h2 className="text-2xl font-bold text-white drop-shadow-md">
+                            {failureEffect === "smoke" ? "The smoke clears..." : "A small bite..."}
+                        </h2>
+                    </div>
+                )}
                 {/* Juicy Squishy Progress Bar */}
                 <div className="absolute bottom-6 left-6 right-6 h-4 bg-black/20 rounded-full overflow-hidden blur-[0.5px]">
                     <div
@@ -133,14 +189,7 @@ export default function CravingsManager() {
                                 <p>Observe the craving. Does it change?</p>
 
                                 <button
-                                    onClick={async () => {
-                                        // End Timer Early logic
-                                        setActiveState({ isActive: false });
-                                        setSelectionMode(null);
-                                        // Award XP for mindfulness if they waited at least a bit? 
-                                        // For now, let's say manually ending it triggers mindfulness check (+10)
-                                        await addXP(10);
-                                    }}
+                                    onClick={handleEndTimerEarly}
                                     className="text-xs text-red-400 hover:text-red-500 transition-colors mt-8 underline decoration-dotted"
                                 >
                                     I need to act now (End Timer)
@@ -149,11 +198,11 @@ export default function CravingsManager() {
                         </>
                     ) : (
                         <>
-                            <div className="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 text-primary">
+                            <div className="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 text-primary shadow-[0_0_20px_#57F287]">
                                 <CheckCircle size={32} />
                             </div>
                             <h2 className="text-2xl font-bold mb-4 text-primary">20 Minutes Complete</h2>
-                            <p className="text-foreground/70 mb-8">The pause is over. You have Agency. What do you choose?</p>
+                            <p className="text-foreground/70 mb-8">The pause is over. You have Agency. +10 XP Awarded.</p>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <button
@@ -162,7 +211,7 @@ export default function CravingsManager() {
                                     className="ghibli-btn-primary py-4"
                                 >
                                     <Leaf size={24} />
-                                    Didn't Do It
+                                    I Chose Not To
                                 </button>
                                 <button
                                     onClick={() => handleOutcome("consumed")}
@@ -170,7 +219,7 @@ export default function CravingsManager() {
                                     className="ghibli-btn bg-muted text-muted-foreground hover:bg-muted/80 py-4"
                                 >
                                     <AlertCircle size={24} />
-                                    Did It
+                                    I Chose To
                                 </button>
                             </div>
                         </>
