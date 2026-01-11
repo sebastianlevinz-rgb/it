@@ -146,7 +146,7 @@ export default function CravingsManager() {
         const percent = timeLeft !== null ? ((20 * 60 * 1000 - timeLeft) / (20 * 60 * 1000)) * 100 : 0;
 
         // Animation Wrapper Classes
-        const wrapperClass = `col-span-2 ghibli-card flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden bg-white/50 border-primary/10 transition-all duration-500
+        const wrapperClass = `col-span-2 rounded-[32px] flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden bg-[#2b2d31]/80 backdrop-blur-xl border border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all duration-500
             ${isGhosting ? "ghost-out" : ""}
         `;
 
@@ -340,7 +340,7 @@ export default function CravingsManager() {
     return (
         <>
             {/* Weed Card: Mint Green Vibe */}
-            <div className="rounded-[32px] bg-[#2b2d31] flex flex-col items-center justify-between aspect-square group overflow-hidden relative hover:border-t-[#57F287]/50 transition-all duration-300 h-full animate-float delay-500 hover-lift shadow-xl border border-white/5">
+            <div className="rounded-[32px] bg-[#2b2d31]/80 backdrop-blur-md flex flex-col items-center justify-between aspect-square group overflow-hidden relative hover:border-t-[#57F287]/50 transition-smooth h-full animate-float delay-500 hover-lift shadow-[0_10px_30px_rgba(0,0,0,0.3)] border border-white/5 p-6">
                 <div className="flex-1 flex flex-col items-center justify-center w-full relative">
                     <div className="absolute top-4 right-4 p-2 opacity-50 text-[#57F287] font-bold text-xs tracking-wider bg-[#57F287]/10 rounded-full">
                         CHILL
@@ -350,11 +350,11 @@ export default function CravingsManager() {
                     </div>
                 </div>
 
-                <div className="w-full p-6 pt-0">
-                    <h2 className="font-black text-2xl mb-4 text-white text-center">Weed</h2>
+                <div className="w-full pt-0">
+                    <h2 className="font-extrabold text-2xl mb-4 text-slate-200 text-center">Weed</h2>
                     <button
                         onClick={() => setSelectionMode("weed")}
-                        className="w-full h-14 bg-[#57F287] hover:bg-[#4ce279] text-black font-extrabold text-lg rounded-2xl active-squish transition-colors flex items-center justify-center shadow-lg hover:shadow-[0_0_20px_rgba(87,242,135,0.4)]"
+                        className="w-full h-14 bg-[#57F287] hover:bg-[#4ce279] text-black font-extrabold text-lg rounded-2xl active-squish transition-smooth flex items-center justify-center shadow-lg hover:shadow-[0_0_20px_rgba(87,242,135,0.4)]"
                     >
                         Vibing
                     </button>
@@ -362,7 +362,7 @@ export default function CravingsManager() {
             </div>
 
             {/* Food Card: Vivid Yellow Vibe */}
-            <div className="rounded-[32px] bg-[#2b2d31] flex flex-col items-center justify-between aspect-square group overflow-hidden relative hover:border-t-[#FEE75C]/50 transition-all duration-300 h-full animate-float delay-1000 hover-lift shadow-xl border border-white/5">
+            <div className="rounded-[32px] bg-[#2b2d31]/80 backdrop-blur-md flex flex-col items-center justify-between aspect-square group overflow-hidden relative hover:border-t-[#FEE75C]/50 transition-smooth h-full animate-float delay-1000 hover-lift shadow-[0_10px_30px_rgba(0,0,0,0.3)] border border-white/5 p-6">
                 <div className="flex-1 flex flex-col items-center justify-center w-full relative">
                     <div className="absolute top-4 right-4 p-2 opacity-50 text-[#FEE75C] font-bold text-xs tracking-wider bg-[#FEE75C]/10 rounded-full">
                         HUNGRY
@@ -372,11 +372,11 @@ export default function CravingsManager() {
                     </div>
                 </div>
 
-                <div className="w-full p-6 pt-0">
-                    <h2 className="font-black text-2xl mb-4 text-white text-center">Food</h2>
+                <div className="w-full pt-0">
+                    <h2 className="font-extrabold text-2xl mb-4 text-slate-200 text-center">Food</h2>
                     <button
                         onClick={() => setSelectionMode("food")}
-                        className="w-full h-14 bg-[#FEE75C] hover:bg-[#eacb35] text-black font-extrabold text-lg rounded-2xl active-squish transition-colors flex items-center justify-center shadow-lg hover:shadow-[0_0_20px_rgba(254,231,92,0.4)]"
+                        className="w-full h-14 bg-[#FEE75C] hover:bg-[#eacb35] text-black font-extrabold text-lg rounded-2xl active-squish transition-smooth flex items-center justify-center shadow-lg hover:shadow-[0_0_20px_rgba(254,231,92,0.4)]"
                         style={{ boxShadow: 'none' }}
                     >
                         Snacking

@@ -6,7 +6,7 @@ export default async function InsightsPage() {
     const data = await getInsightsData();
 
     return (
-        <main className="min-h-screen pb-24 p-5 flex flex-col font-sans max-w-md mx-auto relative bg-gradient-to-br from-[#1e1f22] via-[#2b2d31] to-black overflow-hidden font-medium text-gray-100 animate-living-gradient">
+        <main className="min-h-screen pb-24 p-5 flex flex-col font-sans max-w-md mx-auto relative bg-gradient-to-br from-[#0a0a12] via-[#161625] to-black overflow-hidden font-medium text-slate-200 animate-living-gradient">
             {/* Header */}
             <header className="mb-8 mt-6 flex justify-between items-center relative z-10">
                 <h1 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">Insights</h1>

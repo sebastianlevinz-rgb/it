@@ -22,10 +22,10 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
     }, []);
 
     return (
-        <main className="min-h-screen pb-24 p-5 flex flex-col font-sans max-w-md mx-auto relative bg-gradient-to-br from-[#1e1f22] via-[#2b2d31] to-black overflow-hidden font-medium text-gray-100 animate-living-gradient">
+        <main className="min-h-screen pb-24 p-5 flex flex-col font-sans max-w-md mx-auto relative bg-gradient-to-br from-[#0a0a12] via-[#161625] to-black overflow-hidden font-medium text-slate-200 animate-living-gradient">
             {/* Background: Pure Black with Mesh Gradient Blobs - Keep for depth, but adjusted opacity */}
-            <div className="fixed top-[-20%] left-[-20%] w-[500px] h-[500px] bg-[#5865F2]/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen animate-pulse-slow"></div>
-            <div className="fixed bottom-[-20%] right-[-20%] w-[500px] h-[500px] bg-[#57F287]/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen animate-pulse-slow delay-1000"></div>
+            <div className="fixed top-[-20%] left-[-20%] w-[500px] h-[500px] bg-[#5865F2]/5 rounded-full blur-[120px] pointer-events-none mix-blend-screen animate-pulse-slow"></div>
+            <div className="fixed bottom-[-20%] right-[-20%] w-[500px] h-[500px] bg-[#57F287]/5 rounded-full blur-[120px] pointer-events-none mix-blend-screen animate-pulse-slow delay-1000"></div>
 
             {/* Noise Texture */}
             <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>

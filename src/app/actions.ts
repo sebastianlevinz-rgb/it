@@ -127,183 +127,6 @@ export async function getActiveImpulseState(): Promise<ActiveState> {
     };
 }
 
-// ---------------- FASTING MODULE ----------------
-
-export type FastingState = {
-    isFasting: boolean;
-    lastEventTime: Date | null;
-    durationMinutes: number;
-};
-
-export async function toggleFastingWindow(): Promise<FastingState> {
-    await ensureUser();
-
-    // Get current state
-    const currentState = await getFastingState();
-    const nextEventType = currentState.isFasting ? "window_start" : "window_end"; // If fasting, we start eating window.
-
-    // Log the new event
-    await prisma.event.create({
-        data: {
-            userId: DEMO_USER_ID,
-            module: "fasting",
-            eventType: nextEventType,
-            payload: {},
-        },
-    });
-
-    revalidatePath("/");
-    return getFastingState();
-}
-
-export async function getFastingState(): Promise<FastingState> {
-    await ensureUser();
-
-    const lastEvent = await prisma.event.findFirst({
-        where: {
-            userId: DEMO_USER_ID,
-            module: "fasting",
-        },
-        orderBy: {
-            timestamp: "desc",
-        },
-    });
-
-    if (!lastEvent) {
-        return { isFasting: false, lastEventTime: null, durationMinutes: 0 };
-    }
-
-    // If last event was 'window_end', we are currently FASTING.
-    // If last event was 'window_start', we are currently EATING (not fasting).
-    const isFasting = lastEvent.eventType === "window_end";
-
-    const now = new Date().getTime();
-    const eventTime = new Date(lastEvent.timestamp).getTime();
-    const durationMinutes = Math.floor((now - eventTime) / 1000 / 60);
-
-    return {
-        isFasting,
-        lastEventTime: lastEvent.timestamp,
-        durationMinutes,
-    };
-}
-
-// ---------------- EXERCISE MODULE ----------------
-
-export type ExercisePayload = {
-    type: string;
-    intensity: number;
-    duration?: number;
-};
-
-export async function logExercise(payload: ExercisePayload) {
-    await ensureUser();
-
-    await prisma.event.create({
-        data: {
-            userId: DEMO_USER_ID,
-            module: "exercise",
-            eventType: "log",
-            payload: payload as any,
-        },
-    });
-
-    revalidatePath("/");
-}
-
-export async function getDailyExerciseMinutes(): Promise<number> {
-    await ensureUser();
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const logs = await prisma.event.findMany({
-        where: {
-            userId: DEMO_USER_ID,
-            module: "exercise",
-            timestamp: {
-                gte: today,
-            },
-        },
-    });
-
-    // Calculate total minutes from payload
-    // Note: We cast payload to check for duration
-    const totalMinutes = logs.reduce((acc: number, log: any) => {
-        const p = log.payload as unknown as ExercisePayload;
-        return acc + (p.duration || 0);
-    }, 0);
-
-    return totalMinutes;
-}
-
-// ---------------- DIGITAL DETOX (SLEEP) MODULE ----------------
-
-export type SleepMode = "active" | "sleep" | "morning_lock";
-
-export type SleepState = {
-    mode: SleepMode;
-    remainingMs?: number; // Only for morning_lock
-};
-
-export async function logSleepEvent(eventType: "sunset_start" | "wake_up" | "morning_lock_end") {
-    await ensureUser();
-
-    await prisma.event.create({
-        data: {
-            userId: DEMO_USER_ID,
-            module: "sleep",
-            eventType: eventType,
-            payload: {},
-        },
-    });
-
-    revalidatePath("/");
-}
-
-export async function getSleepState(): Promise<SleepState> {
-    await ensureUser();
-
-    const lastEvent = await prisma.event.findFirst({
-        where: {
-            userId: DEMO_USER_ID,
-            module: "sleep",
-        },
-        orderBy: {
-            timestamp: "desc",
-        },
-    });
-
-    if (!lastEvent) {
-        return { mode: "active" };
-    }
-
-    if (lastEvent.eventType === "sunset_start") {
-        return { mode: "sleep" };
-    }
-
-    if (lastEvent.eventType === "wake_up") {
-        const LOCK_DURATION_MS = 30 * 60 * 1000; // 30 minutes
-        const now = new Date().getTime();
-        const eventTime = new Date(lastEvent.timestamp).getTime();
-        const elapsed = now - eventTime;
-
-        if (elapsed < LOCK_DURATION_MS) {
-            return {
-                mode: "morning_lock",
-                remainingMs: LOCK_DURATION_MS - elapsed
-            };
-        }
-
-        // If > 30 mins have passed, we implicitly consider it active, 
-        // even if 'morning_lock_end' wasn't explicitly logged yet.
-        return { mode: "active" };
-    }
-
-    // 'morning_lock_end' or anything else
-    return { mode: "active" };
-}
-
 // ---------------- INSIGHTS MODULE ----------------
 
 export type InsightsData = {
@@ -311,7 +134,6 @@ export type InsightsData = {
     peakHours: { hour: number; count: number }[]; // 0-23
     agencyScore: number; // % of impulses where delay_start happened vs total impulses
     triggerDistribution: { category: string; count: number }[]; // Enhancement vs Avoidance
-    fastingAverage: number; // hours
     aiVibeCheck: string; // The "Friendly AI Insight"
 };
 
@@ -396,35 +218,7 @@ export async function getInsightsData(): Promise<InsightsData> {
     const resistedCount = outcomes.filter((e: any) => (e.payload as any).outcome === "resisted").length;
     const agencyScore = outcomes.length > 0 ? Math.round((resistedCount / outcomes.length) * 100) : 0;
 
-    // 4. Fasting Average
-    // Find pairs of window_end (start fasting) -> window_start (break fast)
-    // This is a rough calculation for MVP iterating chronologically
-    let totalFastingHours = 0;
-    let fastingSessions = 0;
-
-    // Sort ascending for this calc
-    const fastingEvents = events
-        .filter((e: any) => e.module === "fasting")
-        .sort((a: any, b: any) => a.timestamp.getTime() - b.timestamp.getTime());
-
-    let lastFastStart: Date | null = null;
-
-    fastingEvents.forEach((e: any) => {
-        if (e.eventType === "window_end") { // Started fasting
-            lastFastStart = e.timestamp;
-        } else if (e.eventType === "window_start" && lastFastStart) { // Broke fast
-            const hours = (e.timestamp.getTime() - lastFastStart.getTime()) / 1000 / 60 / 60;
-            if (hours > 0 && hours < 48) { // basic sanity check
-                totalFastingHours += hours;
-                fastingSessions++;
-            }
-            lastFastStart = null;
-        }
-    });
-
-    const fastingAverage = fastingSessions > 0 ? parseFloat((totalFastingHours / fastingSessions).toFixed(1)) : 0;
-
-    // 5. AI Vibe Check (Heuristic)
+    // 4. AI Vibe Check (Heuristic)
     let aiVibeCheck = "Gathering more data to read your vibe...";
 
     if (impulseEvents.length > 5) {
@@ -453,7 +247,6 @@ export async function getInsightsData(): Promise<InsightsData> {
         peakHours,
         agencyScore,
         triggerDistribution,
-        fastingAverage,
         aiVibeCheck
     };
 }
