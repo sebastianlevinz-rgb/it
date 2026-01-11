@@ -33,14 +33,14 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
             {/* Breathe Modal */}
             {showBreathe && <BreatheModal onClose={() => setShowBreathe(false)} />}
 
-            {/* Header - Compact */}
+            {/* Header - Compact & Centered */}
             <header className="mb-2 mt-4 flex flex-col gap-3 relative z-10 shrink-0">
-                <div className="flex justify-between items-center">
-                    <div>
+                <div className="flex justify-center items-center relative h-10">
+                    <div className="text-center z-10">
                         <h1 className="text-3xl font-black tracking-tighter text-white drop-shadow-sm uppercase leading-none">Impulse</h1>
                         <p className="text-[#B5BAC1] text-xs font-semibold tracking-wide">The power of the gap</p>
                     </div>
-                    <Link href="/settings" className="p-2 hover:bg-white/10 rounded-full text-[#B5BAC1] hover:text-white transition-colors active-squish">
+                    <Link href="/settings" className="absolute right-0 top-1/2 -translate-y-1/2 p-2 hover:bg-white/10 rounded-full text-[#B5BAC1] hover:text-white transition-colors active-squish">
                         <Settings size={20} strokeWidth={2.5} />
                     </Link>
                 </div>
@@ -71,7 +71,7 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
                 {/* Breathe Pill - Floating & Rounded */}
                 <button
                     onClick={() => setShowBreathe(true)}
-                    className="w-full relative flex items-center justify-between px-8 py-5 transition-all group rounded-[50px] bg-[#2b2d31]/80 backdrop-blur-xl hover:bg-[#313338] hover:-translate-y-1 active:translate-y-0 active-squish shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5),0_0_20px_rgba(255,255,255,0.05)_inset] border border-white/5"
+                    className="w-full relative flex items-center justify-between px-8 py-5 transition-all group rounded-[50px] bg-[#2b2d31]/80 backdrop-blur-xl hover:bg-[#313338] active-squish border border-white/5 animate-float-gentle shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5),0_0_20px_rgba(255,255,255,0.05)_inset]"
                 >
                     <span className="font-bold text-lg text-white group-hover:text-[#5865F2] transition-colors">Take a Moment</span>
                     <div className="bg-[#5865F2]/20 p-2 rounded-full text-[#5865F2] group-hover:rotate-180 transition-transform duration-700">

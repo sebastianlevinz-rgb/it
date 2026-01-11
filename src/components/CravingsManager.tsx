@@ -337,26 +337,31 @@ export default function CravingsManager() {
     // 3. DASHBOARD CARDS VIEW (DEFAULT - GRID)
     return (
         <div className="grid grid-cols-2 gap-5 w-full">
-            {/* Weed Island */}
-            <div className="rounded-[32px] bg-[#2b2d31]/80 backdrop-blur-xl flex flex-col items-center justify-center gap-3 group overflow-hidden relative hover:-translate-y-1 hover:bg-[#313338] transition-all duration-300 w-full aspect-square shadow-[0_20px_40px_-10px_rgba(0,0,0,0.6),0_0_20px_rgba(255,255,255,0.02)_inset] border border-white/5 p-4 active-squish cursor-pointer"
-                onClick={() => setSelectionMode("weed")}>
+            {/* Weed Island - Staggered Float & Breathe */}
+            <div className="animate-float-gentle" style={{ animationDelay: '0.5s' }}>
+                <div className="rounded-[32px] bg-[#2b2d31]/80 backdrop-blur-xl flex flex-col items-center justify-center gap-3 group overflow-hidden relative transition-all duration-300 w-full aspect-square border border-white/5 p-4 active-squish cursor-pointer animate-breathe-glow"
+                    onClick={() => setSelectionMode("weed")}>
 
-                <div className="p-4 bg-[#57F287]/10 rounded-full text-[#57F287] group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(87,242,135,0.15)]">
-                    <Cannabis size={36} strokeWidth={2.5} />
+                    <div className="p-4 bg-[#57F287]/10 rounded-full text-[#57F287] group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(87,242,135,0.15)]">
+                        <Cannabis size={36} strokeWidth={2.5} />
+                    </div>
+
+                    <h2 className="font-bold text-lg text-slate-200 group-hover:text-white transition-colors">Weed</h2>
                 </div>
-
-                <h2 className="font-bold text-lg text-slate-200 group-hover:text-white transition-colors">Weed</h2>
             </div>
 
-            {/* Food Island */}
-            <div className="rounded-[32px] bg-[#2b2d31]/80 backdrop-blur-xl flex flex-col items-center justify-center gap-3 group overflow-hidden relative hover:-translate-y-1 hover:bg-[#313338] transition-all duration-300 w-full aspect-square shadow-[0_20px_40px_-10px_rgba(0,0,0,0.6),0_0_20px_rgba(255,255,255,0.02)_inset] border border-white/5 p-4 active-squish cursor-pointer"
-                onClick={() => setSelectionMode("food")}>
+            {/* Food Island - Staggered Float & Breathe */}
+            <div className="animate-float-gentle" style={{ animationDelay: '1.0s' }}>
+                <div className="rounded-[32px] bg-[#2b2d31]/80 backdrop-blur-xl flex flex-col items-center justify-center gap-3 group overflow-hidden relative transition-all duration-300 w-full aspect-square border border-white/5 p-4 active-squish cursor-pointer animate-breathe-glow"
+                    style={{ animationDelay: '2s' }}
+                    onClick={() => setSelectionMode("food")}>
 
-                <div className="p-4 bg-[#FEE75C]/10 rounded-full text-[#FEE75C] group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(254,231,92,0.15)]">
-                    <Utensils size={36} strokeWidth={2.5} />
+                    <div className="p-4 bg-[#FEE75C]/10 rounded-full text-[#FEE75C] group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(254,231,92,0.15)]">
+                        <Utensils size={36} strokeWidth={2.5} />
+                    </div>
+
+                    <h2 className="font-bold text-lg text-slate-200 group-hover:text-white transition-colors">Food</h2>
                 </div>
-
-                <h2 className="font-bold text-lg text-slate-200 group-hover:text-white transition-colors">Food</h2>
             </div>
         </div>
     );
