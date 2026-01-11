@@ -146,7 +146,7 @@ export default function CravingsManager() {
         const percent = timeLeft !== null ? ((20 * 60 * 1000 - timeLeft) / (20 * 60 * 1000)) * 100 : 0;
 
         // Animation Wrapper Classes
-        const wrapperClass = `col-span-2 rounded-[24px] flex flex-col items-center justify-center relative overflow-hidden bg-[#2b2d31]/80 backdrop-blur-xl border border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all duration-500 h-full p-4
+        const wrapperClass = `col-span-2 rounded-[40px] flex flex-col items-center justify-center relative overflow-hidden bg-[#2b2d31]/90 backdrop-blur-xl border border-white/5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.7),0_0_30px_rgba(0,0,0,0.2)_inset] transition-all duration-500 w-full aspect-[4/3] p-6
             ${isGhosting ? "ghost-out" : ""}
         `;
 
@@ -336,44 +336,27 @@ export default function CravingsManager() {
 
     // 3. DASHBOARD CARDS VIEW (DEFAULT - GRID)
     return (
-        <div className="grid grid-cols-2 gap-3 h-full pb-2">
-            {/* Weed Card: Mint Green Vibe */}
-            <div className="rounded-[24px] bg-[#2b2d31]/80 backdrop-blur-md flex flex-col items-center justify-between group overflow-hidden relative hover:border-t-[#57F287]/50 transition-smooth w-full h-full animate-float delay-500 hover-lift shadow-[0_10px_20px_rgba(0,0,0,0.3)] border border-white/5 p-4">
-                <div className="flex-1 flex flex-col items-center justify-center w-full relative">
-                    <div className="p-4 bg-[#57F287]/10 rounded-full text-[#57F287] group-hover:scale-110 transition-transform duration-300 border border-[#57F287]/20 shadow-[0_0_20px_rgba(87,242,135,0.2)]">
-                        <Cannabis size={40} strokeWidth={2.5} className="drop-shadow-sm" />
-                    </div>
+        <div className="grid grid-cols-2 gap-5 w-full">
+            {/* Weed Island */}
+            <div className="rounded-[32px] bg-[#2b2d31]/80 backdrop-blur-xl flex flex-col items-center justify-center gap-3 group overflow-hidden relative hover:-translate-y-1 hover:bg-[#313338] transition-all duration-300 w-full aspect-square shadow-[0_20px_40px_-10px_rgba(0,0,0,0.6),0_0_20px_rgba(255,255,255,0.02)_inset] border border-white/5 p-4 active-squish cursor-pointer"
+                onClick={() => setSelectionMode("weed")}>
+
+                <div className="p-4 bg-[#57F287]/10 rounded-full text-[#57F287] group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(87,242,135,0.15)]">
+                    <Cannabis size={36} strokeWidth={2.5} />
                 </div>
 
-                <div className="w-full pt-2">
-                    <h2 className="font-extrabold text-lg mb-3 text-slate-200 text-center">Weed</h2>
-                    <button
-                        onClick={() => setSelectionMode("weed")}
-                        className="w-full h-10 bg-[#57F287] hover:bg-[#4ce279] text-black font-extrabold text-sm rounded-xl active-squish transition-smooth flex items-center justify-center shadow-md hover:shadow-[0_0_15px_rgba(87,242,135,0.4)]"
-                    >
-                        Vibing
-                    </button>
-                </div>
+                <h2 className="font-bold text-lg text-slate-200 group-hover:text-white transition-colors">Weed</h2>
             </div>
 
-            {/* Food Card: Vivid Yellow Vibe */}
-            <div className="rounded-[24px] bg-[#2b2d31]/80 backdrop-blur-md flex flex-col items-center justify-between group overflow-hidden relative hover:border-t-[#FEE75C]/50 transition-smooth w-full h-full animate-float delay-1000 hover-lift shadow-[0_10px_20px_rgba(0,0,0,0.3)] border border-white/5 p-4">
-                <div className="flex-1 flex flex-col items-center justify-center w-full relative">
-                    <div className="p-4 bg-[#FEE75C]/10 rounded-full text-[#FEE75C] group-hover:scale-110 transition-transform duration-300 border border-[#FEE75C]/20 shadow-[0_0_20px_rgba(254,231,92,0.2)]">
-                        <Utensils size={40} strokeWidth={2.5} className="drop-shadow-sm" />
-                    </div>
+            {/* Food Island */}
+            <div className="rounded-[32px] bg-[#2b2d31]/80 backdrop-blur-xl flex flex-col items-center justify-center gap-3 group overflow-hidden relative hover:-translate-y-1 hover:bg-[#313338] transition-all duration-300 w-full aspect-square shadow-[0_20px_40px_-10px_rgba(0,0,0,0.6),0_0_20px_rgba(255,255,255,0.02)_inset] border border-white/5 p-4 active-squish cursor-pointer"
+                onClick={() => setSelectionMode("food")}>
+
+                <div className="p-4 bg-[#FEE75C]/10 rounded-full text-[#FEE75C] group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(254,231,92,0.15)]">
+                    <Utensils size={36} strokeWidth={2.5} />
                 </div>
 
-                <div className="w-full pt-2">
-                    <h2 className="font-extrabold text-lg mb-3 text-slate-200 text-center">Food</h2>
-                    <button
-                        onClick={() => setSelectionMode("food")}
-                        className="w-full h-10 bg-[#FEE75C] hover:bg-[#eacb35] text-black font-extrabold text-sm rounded-xl active-squish transition-smooth flex items-center justify-center shadow-md hover:shadow-[0_0_15px_rgba(254,231,92,0.4)]"
-                        style={{ boxShadow: 'none' }}
-                    >
-                        Snacking
-                    </button>
-                </div>
+                <h2 className="font-bold text-lg text-slate-200 group-hover:text-white transition-colors">Food</h2>
             </div>
         </div>
     );

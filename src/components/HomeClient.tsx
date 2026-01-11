@@ -65,23 +65,24 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
                 )}
             </header>
 
-            {/* Breathe Button - Compact Bar */}
-            <button
-                onClick={() => setShowBreathe(true)}
-                className="w-full relative z-10 mb-4 flex items-center justify-center gap-3 transition-all group py-3 rounded-2xl bg-[#2b2d31] hover:bg-[#313338] hover-lift active-squish shadow-lg border border-white/5 shrink-0"
-            >
-                <Wind size={20} strokeWidth={2.5} className="text-[#5865F2] group-hover:rotate-180 transition-transform duration-700" />
-                <span className="font-bold text-sm text-white group-hover:text-[#5865F2] transition-colors">Take a Moment</span>
-            </button>
+            {/* The Vibe Space - Centered Action Cluster */}
+            <div className="flex-1 flex flex-col justify-center gap-6 w-full max-w-[320px] mx-auto z-10 relative">
 
-            {/* Stack Layout - Vertical Stacking handled by flex-1 parent, but we want grid */}
-            <div className="relative z-10 flex-1 min-h-0 mb-4">
+                {/* Breathe Pill - Floating & Rounded */}
+                <button
+                    onClick={() => setShowBreathe(true)}
+                    className="w-full relative flex items-center justify-between px-8 py-5 transition-all group rounded-[50px] bg-[#2b2d31]/80 backdrop-blur-xl hover:bg-[#313338] hover:-translate-y-1 active:translate-y-0 active-squish shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5),0_0_20px_rgba(255,255,255,0.05)_inset] border border-white/5"
+                >
+                    <span className="font-bold text-lg text-white group-hover:text-[#5865F2] transition-colors">Take a Moment</span>
+                    <div className="bg-[#5865F2]/20 p-2 rounded-full text-[#5865F2] group-hover:rotate-180 transition-transform duration-700">
+                        <Wind size={20} strokeWidth={3} />
+                    </div>
+                </button>
 
-                {/* Dynamic Cravings Module handles Weed & Food */}
-                <CravingsManager />
-
-
-
+                {/* Grid Container */}
+                <div className="w-full">
+                    <CravingsManager />
+                </div>
             </div>
 
 
