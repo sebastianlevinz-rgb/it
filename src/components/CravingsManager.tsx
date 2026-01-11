@@ -284,47 +284,47 @@ export default function CravingsManager() {
     // 3. DASHBOARD CARDS VIEW (DEFAULT)
     return (
         <>
-            {/* Weed Card: Perfect Symmetry */}
-            <div className="glass-card flex flex-col items-center justify-between aspect-square group overflow-hidden relative hover:border-t-green-500/30 transition-all duration-500 h-full animate-float delay-500">
+            {/* Weed Card: Mint Green Vibe */}
+            <div className="rounded-[32px] bg-[#2b2d31] flex flex-col items-center justify-between aspect-square group overflow-hidden relative hover:border-t-[#57F287]/50 transition-all duration-300 h-full animate-float delay-500 hover-lift shadow-xl border border-white/5">
                 <div className="flex-1 flex flex-col items-center justify-center w-full relative">
-                    <div className="absolute top-0 right-0 p-3 opacity-30 group-hover:opacity-100 transition-opacity">
-                        <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_15px_#22c55e] animate-pulse"></div>
+                    <div className="absolute top-4 right-4 p-2 opacity-50 text-[#57F287] font-bold text-xs tracking-wider bg-[#57F287]/10 rounded-full">
+                        CHILL
                     </div>
-                    <div className="p-5 bg-green-500/10 rounded-full text-green-500 group-hover:scale-110 transition-transform duration-500 backdrop-blur-sm border border-green-500/10 shadow-[0_0_30px_rgba(34,197,94,0.1)] group-hover:shadow-[0_0_60px_rgba(34,197,94,0.3)]">
-                        <Cannabis size={48} className="drop-shadow-[0_0_15px_rgba(34,197,94,0.6)]" />
+                    <div className="p-6 bg-[#57F287]/10 rounded-full text-[#57F287] group-hover:scale-110 transition-transform duration-300 border border-[#57F287]/20 shadow-[0_0_30px_rgba(87,242,135,0.2)]">
+                        <Cannabis size={56} strokeWidth={2.5} className="drop-shadow-sm" />
                     </div>
                 </div>
 
-                <div className="w-full">
-                    <h2 className="font-bold text-xl mb-3 text-white text-center">Weed</h2>
+                <div className="w-full p-6 pt-0">
+                    <h2 className="font-black text-2xl mb-4 text-white text-center">Weed</h2>
                     <button
                         onClick={() => setSelectionMode("weed")}
-                        className="glass-btn-primary w-full h-12 text-base tracking-wide justify-center hover:scale-[1.02] px-4 whitespace-nowrap"
+                        className="w-full h-14 bg-[#57F287] hover:bg-[#4ce279] text-black font-extrabold text-lg rounded-2xl active-squish transition-colors flex items-center justify-center shadow-lg hover:shadow-[0_0_20px_rgba(87,242,135,0.4)]"
                     >
-                        I feel an impulse
+                        Vibing
                     </button>
                 </div>
             </div>
 
-            {/* Food Card: Perfect Symmetry */}
-            <div className="glass-card flex flex-col items-center justify-between aspect-square group overflow-hidden relative hover:border-t-orange-500/30 transition-all duration-500 h-full animate-float delay-1000">
+            {/* Food Card: Vivid Yellow Vibe */}
+            <div className="rounded-[32px] bg-[#2b2d31] flex flex-col items-center justify-between aspect-square group overflow-hidden relative hover:border-t-[#FEE75C]/50 transition-all duration-300 h-full animate-float delay-1000 hover-lift shadow-xl border border-white/5">
                 <div className="flex-1 flex flex-col items-center justify-center w-full relative">
-                    <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                        <div className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_15px_#F97316] animate-pulse"></div>
+                    <div className="absolute top-4 right-4 p-2 opacity-50 text-[#FEE75C] font-bold text-xs tracking-wider bg-[#FEE75C]/10 rounded-full">
+                        HUNGRY
                     </div>
-                    <div className="p-5 bg-orange-500/10 rounded-full text-orange-500 group-hover:scale-110 transition-transform duration-500 backdrop-blur-sm border border-orange-500/10 shadow-[0_0_30px_rgba(249,115,22,0.1)] group-hover:shadow-[0_0_60px_rgba(249,115,22,0.3)]">
-                        <Utensils size={48} className="drop-shadow-[0_0_10px_rgba(249,115,22,0.6)]" />
+                    <div className="p-6 bg-[#FEE75C]/10 rounded-full text-[#FEE75C] group-hover:scale-110 transition-transform duration-300 border border-[#FEE75C]/20 shadow-[0_0_30px_rgba(254,231,92,0.2)]">
+                        <Utensils size={56} strokeWidth={2.5} className="drop-shadow-sm" />
                     </div>
                 </div>
 
-                <div className="w-full">
-                    <h2 className="font-bold text-xl mb-3 text-white text-center">Food</h2>
+                <div className="w-full p-6 pt-0">
+                    <h2 className="font-black text-2xl mb-4 text-white text-center">Food</h2>
                     <button
                         onClick={() => setSelectionMode("food")}
-                        className="glass-btn-primary w-full h-12 px-4 flex items-center justify-center text-base tracking-wide whitespace-nowrap text-orange-400 bg-orange-500/10 border-orange-500/30 hover:bg-orange-500/20"
+                        className="w-full h-14 bg-[#FEE75C] hover:bg-[#eacb35] text-black font-extrabold text-lg rounded-2xl active-squish transition-colors flex items-center justify-center shadow-lg hover:shadow-[0_0_20px_rgba(254,231,92,0.4)]"
                         style={{ boxShadow: 'none' }}
                     >
-                        I feel an impulse
+                        Snacking
                     </button>
                 </div>
             </div>

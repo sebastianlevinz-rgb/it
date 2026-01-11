@@ -13,10 +13,10 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
     const [showBreathe, setShowBreathe] = useState(false);
 
     return (
-        <main className="min-h-screen pb-24 p-5 flex flex-col font-sans max-w-md mx-auto relative bg-[linear-gradient(to_bottom,#000033,#000000)] overflow-hidden">
-            {/* Background: Pure Black with Mesh Gradient Blobs */}
-            <div className="fixed top-[-20%] left-[-20%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen animate-pulse-slow"></div>
-            <div className="fixed bottom-[-20%] right-[-20%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen animate-pulse-slow delay-1000"></div>
+        <main className="min-h-screen pb-24 p-5 flex flex-col font-sans max-w-md mx-auto relative bg-[linear-gradient(to_bottom,#1e1f22,#2b2d31)] overflow-hidden font-medium text-gray-100">
+            {/* Background: Pure Black with Mesh Gradient Blobs - Keep for depth, but adjusted opacity */}
+            <div className="fixed top-[-20%] left-[-20%] w-[500px] h-[500px] bg-[#5865F2]/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen animate-pulse-slow"></div>
+            <div className="fixed bottom-[-20%] right-[-20%] w-[500px] h-[500px] bg-[#57F287]/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen animate-pulse-slow delay-1000"></div>
 
             {/* Noise Texture */}
             <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
@@ -24,23 +24,23 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
             {/* Breathe Modal */}
             {showBreathe && <BreatheModal onClose={() => setShowBreathe(false)} />}
 
-            <header className="mb-10 mt-6 flex justify-between items-end relative z-10">
+            <header className="mb-8 mt-6 flex justify-between items-center relative z-10">
                 <div>
-                    <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-2xl">Craving App</h1>
-                    <p className="text-gray-400 text-sm font-medium mt-1">Neutral observation.</p>
+                    <h1 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">Craving App</h1>
+                    <p className="text-[#B5BAC1] text-sm font-semibold mt-1">What's the vibe today?</p>
                 </div>
                 <div className="flex items-center gap-4">
                     {agencyScore !== null && (
                         <div className="flex flex-col items-end">
-                            <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Weekly Agency</span>
-                            <div className="flex items-center gap-1.5 text-primary drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]">
-                                <ShieldCheck size={20} fill="currentColor" />
-                                <span className="font-bold text-2xl">{agencyScore}%</span>
+                            <span className="text-[10px] text-[#B5BAC1] uppercase tracking-widest font-bold mb-1">Agency</span>
+                            <div className="flex items-center gap-1.5 text-[#5865F2] drop-shadow-md">
+                                <ShieldCheck size={20} fill="currentColor" strokeWidth={2.5} />
+                                <span className="font-extrabold text-2xl">{agencyScore}%</span>
                             </div>
                         </div>
                     )}
-                    <Link href="/settings" className="p-3 hover:bg-white/5 rounded-full text-gray-400 hover:text-white transition-colors border border-transparent hover:border-white/10">
-                        <Settings size={22} />
+                    <Link href="/settings" className="p-3 hover:bg-white/10 rounded-full text-[#B5BAC1] hover:text-white transition-colors active-squish">
+                        <Settings size={24} strokeWidth={2.5} />
                     </Link>
                 </div>
             </header>
@@ -48,12 +48,12 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
             {/* Breathe Button (Action Entry) */}
             <button
                 onClick={() => setShowBreathe(true)}
-                className="w-full relative z-10 glass-card mb-8 flex items-center justify-center gap-4 transition-all hover:border-t-primary/50 hover:shadow-[0_10px_40px_rgba(16,185,129,0.15)] group py-6 bg-[linear-gradient(180deg,rgba(255,255,255,0.03)_0%,rgba(255,255,255,0.01)_100%)] hover:bg-[linear-gradient(180deg,rgba(16,185,129,0.1)_0%,rgba(16,185,129,0.02)_100%)] animate-float"
+                className="w-full relative z-10 mb-8 flex items-center justify-center gap-4 transition-all group py-6 rounded-[24px] bg-[#2b2d31] hover:bg-[#313338] hover-lift active-squish shadow-lg border border-white/5"
             >
-                <div className="p-3 rounded-full bg-primary/10 text-primary group-hover:scale-110 transition-transform duration-500 border border-primary/20">
-                    <Wind size={24} className="group-hover:rotate-180 transition-transform duration-1000" />
+                <div className="p-3 rounded-full bg-[#5865F2]/20 text-[#5865F2] group-hover:scale-110 transition-transform duration-300">
+                    <Wind size={28} strokeWidth={3} className="group-hover:rotate-180 transition-transform duration-700" />
                 </div>
-                <span className="font-bold text-xl text-white group-hover:text-primary transition-colors tracking-tight">Take a Breath</span>
+                <span className="font-bold text-xl text-white group-hover:text-[#5865F2] transition-colors">Take a Breath</span>
             </button>
 
             {/* Stack Layout - Vertical Stacking */}
