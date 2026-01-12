@@ -8,7 +8,7 @@ import confetti from "canvas-confetti";
 const TRIGGERS_ENHANCEMENT = ["Music", "Movies", "Gaming", "Socializing", "Creativity"];
 const TRIGGERS_AVOIDANCE = ["Stress", "Boredom", "Anxiety", "Fatigue", "Loneliness"];
 
-export default function CravingsManager({ onModalChange, initialSelection }: { onModalChange?: (isOpen: boolean) => void; initialSelection?: "weed" | "food" | null }) {
+export default function CravingsManager({ onModalChange, initialSelection, autoStart = false }: { onModalChange?: (isOpen: boolean) => void; initialSelection?: "weed" | "food" | null; autoStart?: boolean }) {
     const [activeState, setActiveState] = useState<ActiveState>({ isActive: false });
     const [selectionMode, setSelectionMode] = useState<"weed" | "food" | null>(null);
 
@@ -30,6 +30,13 @@ export default function CravingsManager({ onModalChange, initialSelection }: { o
             onModalChange(!!selectionMode);
         }
     }, [selectionMode, onModalChange]);
+
+    // Auto-Start Selection if requested
+    useEffect(() => {
+        if (autoStart && initialSelection && !selectionMode) {
+            setSelectionMode(initialSelection);
+        }
+    }, [autoStart, initialSelection]);
 
     // Load initial state
     useEffect(() => {

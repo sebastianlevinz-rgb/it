@@ -12,6 +12,7 @@ import { getLevelInfo, type LevelInfo } from "@/utils/xp";
 export default function HomeClient({ agencyScore }: { agencyScore: number | null }) {
     const [showBreathe, setShowBreathe] = useState(false);
     const [isCravingModalOpen, setIsCravingModalOpen] = useState(false);
+    const [modalSelection, setModalSelection] = useState<"weed" | "food" | null>(null);
     const [levelInfo, setLevelInfo] = useState<LevelInfo | null>(null);
     const [triggerXPGlow, setTriggerXPGlow] = useState(false);
 
@@ -62,6 +63,11 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
         alert("AUDIT LOGGED TO CONSOLE");
     };
 
+    const handleOpenModal = (type: "weed" | "food") => {
+        setModalSelection(type);
+        setIsCravingModalOpen(true);
+    };
+
     return (
         <main className="h-[100svh] min-h-[100svh] flex flex-col font-retro max-w-md mx-auto bg-black text-white overflow-hidden relative border-x-4 border-black mario-sky">
             {/* Cloud Sprites */}
@@ -108,33 +114,46 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
                 )}
             </header>
 
-            {/* MAIN GRID - SECTOR B */}
-            <div id="main-grid" className={`flex-1 flex flex-col justify-between transform transition-all duration-300 ${isCravingModalOpen ? 'p-0' : 'p-6'}`}>
+            {/* MAIN GRID - VERTICAL PLATFORMS */}
+            <div id="main-grid" className={`flex-1 flex flex-col justify-center transform transition-all duration-300 ${isCravingModalOpen ? 'p-0' : 'p-6 gap-6'}`}>
+
                 {!isCravingModalOpen ? (
-                    <div className="flex flex-col gap-8 h-full justify-center">
-                        {/* Take a Moment - POW Block */}
+                    <>
+                        {/* 1. TOP PLATFORM: TAKE A MOMENT (POW) */}
                         <button
                             id="btn-breathe"
                             onClick={() => setShowBreathe(true)}
-                            className="btn-pow w-full py-8 text-sm hover:scale-[1.02]"
+                            className="btn-pow w-full h-32 text-2xl active-shake flex flex-col items-center justify-center gap-2"
                         >
-                            <span className="text-2xl mr-4 block mb-2">🍄</span>
-                            <span className="text-xl">TAKE A MOMENT</span>
+                            <span className="text-4xl filter drop-shadow-md">🍄</span>
+                            <span className="text-xl tracking-widest drop-shadow-md">TAKE A MOMENT</span>
                         </button>
 
-                        {/* The Choice - Bricks */}
-                        <div className="grid grid-cols-2 gap-4 w-full">
-                            <div className="h-48 mario-brick">
-                                <CravingsManager onModalChange={setIsCravingModalOpen} initialSelection="weed" />
-                            </div>
-                            <div className="h-48 mario-brick">
-                                <CravingsManager onModalChange={setIsCravingModalOpen} initialSelection="food" />
-                            </div>
-                        </div>
-                    </div>
+                        {/* 2. MIDDLE PLATFORM: WEED (QUESTION BLOCK) */}
+                        <button
+                            onClick={() => handleOpenModal("weed")}
+                            className="mario-question w-full h-32 pixel-btn bg-[#f1c40f] hover:bg-[#f39c12] active-shake flex flex-col items-center justify-center gap-2 group text-black"
+                        >
+                            <span className="text-4xl filter drop-shadow-md">🌻</span>
+                            <span className="text-xl tracking-widest drop-shadow-md">WEED PROTOCOL</span>
+                        </button>
+
+                        {/* 3. BOTTOM PLATFORM: FOOD (BRICK BLOCK) */}
+                        <button
+                            onClick={() => handleOpenModal("food")}
+                            className="mario-brick w-full h-32 pixel-btn active-shake flex flex-col items-center justify-center gap-2 group text-white"
+                        >
+                            <span className="text-4xl filter drop-shadow-md">⭐</span>
+                            <span className="text-xl tracking-widest drop-shadow-md">FOOD PROTOCOL</span>
+                        </button>
+                    </>
                 ) : (
                     <div className="h-full w-full">
-                        <CravingsManager onModalChange={setIsCravingModalOpen} />
+                        <CravingsManager
+                            onModalChange={setIsCravingModalOpen}
+                            initialSelection={modalSelection}
+                            autoStart={true}
+                        />
                     </div>
                 )}
             </div>
