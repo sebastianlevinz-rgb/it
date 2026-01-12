@@ -56,10 +56,16 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
 
         const gainNode = ctx.createGain();
         gainNode.gain.setValueAtTime(0, ctx.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 2); // Soft Rain Volume
+        gainNode.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 2); // Soft Rain Volume (0.15)
+
+        // Low Pass Filter for "Cozy/Muffled" effect
+        const filterNode = ctx.createBiquadFilter();
+        filterNode.type = "lowpass";
+        filterNode.frequency.setValueAtTime(800, ctx.currentTime); // 800Hz cutoff removes harsh high-end hiss
 
         rainSource.connect(gainNode);
-        gainNode.connect(ctx.destination);
+        gainNode.connect(filterNode);
+        filterNode.connect(ctx.destination);
         rainSource.start();
 
         rainGainRef.current = gainNode;
@@ -305,7 +311,7 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
                     <div className="mb-8 w-full max-w-xs px-4">
                         <button
                             onClick={handleClose}
-                            className="w-full py-4 rounded-full border border-red-500/30 bg-red-500/5 text-red-500/90 font-light tracking-widest uppercase text-xs hover:bg-red-500/10 active:scale-95 transition-all shadow-lg backdrop-blur-sm"
+                            className="w-full py-4 px-8 mt-5 rounded-full border border-red-500/30 bg-red-500/5 text-red-500/90 font-medium tracking-widest uppercase text-xs hover:bg-red-500/10 active:scale-95 transition-all shadow-lg backdrop-blur-sm"
                         >
                             End Session Early
                         </button>
