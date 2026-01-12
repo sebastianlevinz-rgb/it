@@ -11,7 +11,7 @@ type Phase = "inhale" | "hold" | "exhale" | "hold_empty";
 const BREATH_CYCLE = { inhale: 4000, hold: 4000, exhale: 4000, hold_empty: 4000 };
 
 
-export default function BreatheModal({ onClose }: { onClose: () => void }) {
+export default function BreatheModal({ onClose, onSessionComplete }: { onClose: () => void, onSessionComplete?: (success: boolean) => void }) {
     const [isActive, setIsActive] = useState(false);
     const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
     const [timeLeft, setTimeLeft] = useState<number>(0);
@@ -20,8 +20,56 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
     const [text, setText] = useState("Ready");
 
     const audioCtxRef = useRef<AudioContext | null>(null);
+    const rainGainRef = useRef<GainNode | null>(null);
     const breathTimerRef = useRef<NodeJS.Timeout | null>(null);
     const sessionTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    // RAIN GENERATOR (Pink Noise)
+    const startRain = useCallback(() => {
+        if (!audioCtxRef.current) {
+            audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        }
+        const ctx = audioCtxRef.current;
+        const bufferSize = 2 * ctx.sampleRate;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const output = buffer.getChannelData(0);
+
+        // Pink Noise Algorithm
+        let b0, b1, b2, b3, b4, b5, b6;
+        b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
+        for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            b0 = 0.99886 * b0 + white * 0.0555179;
+            b1 = 0.99332 * b1 + white * 0.0750759;
+            b2 = 0.96900 * b2 + white * 0.1538520;
+            b3 = 0.86650 * b3 + white * 0.3104856;
+            b4 = 0.55000 * b4 + white * 0.5329522;
+            b5 = -0.7616 * b5 - white * 0.0168980;
+            output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+            output[i] *= 0.11; // Check master volume
+            b6 = white * 0.115926;
+        }
+
+        const rainSource = ctx.createBufferSource();
+        rainSource.buffer = buffer;
+        rainSource.loop = true;
+
+        const gainNode = ctx.createGain();
+        gainNode.gain.setValueAtTime(0, ctx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 2); // Soft Rain Volume
+
+        rainSource.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        rainSource.start();
+
+        rainGainRef.current = gainNode;
+    }, []);
+
+    const stopRain = useCallback(() => {
+        if (audioCtxRef.current && rainGainRef.current) {
+            rainGainRef.current.gain.linearRampToValueAtTime(0, audioCtxRef.current.currentTime + 1);
+        }
+    }, []);
 
     // TONE GENERATOR
     const playTone = useCallback((freq: number, type: "sine" | "triangle" = "sine", duration: number = 3) => {
@@ -50,6 +98,7 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
         setDurationMinutes(minutes);
         setTimeLeft(minutes * 60);
         setIsActive(true);
+        startRain();
         startCycle();
     };
 
@@ -75,9 +124,18 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
     }, [isActive]);
 
     const completeSession = async () => {
+        stopRain();
         if (durationMinutes) {
             await logMeditation(durationMinutes);
+            if (onSessionComplete && durationMinutes >= 15) {
+                onSessionComplete(true);
+            }
         }
+        onClose();
+    };
+
+    const handleClose = () => {
+        stopRain();
         onClose();
     };
 
@@ -171,7 +229,7 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
             </div>
 
             <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="absolute top-6 right-6 p-4 rounded-full bg-white/10 text-white/50 hover:bg-white/20 hover:text-white transition-all z-50"
             >
                 <X size={32} />
@@ -202,10 +260,10 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
                 </div>
             ) : (
                 // ACTIVE BREATHING SCREEN (FLEXBOX CENTERED)
-                <div className="flex flex-col items-center justify-between h-full w-full py-12 relative z-10">
+                <div className="flex flex-col items-center justify-between h-full w-full py-12 relative z-10 min-h-[100dvh]">
 
                     {/* Top: Timer */}
-                    <div className="text-center opacity-80 mt-12">
+                    <div className="text-center opacity-80 mt-12 bg-black/20 px-6 py-2 rounded-full border border-white/5 backdrop-blur-sm">
                         <span className="font-mono text-xl tracking-widest">{formatTime(timeLeft)}</span>
                     </div>
 
@@ -243,11 +301,11 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
                         </h2>
                     </div>
 
-                    {/* Bottom: Ghost Button */}
-                    <div className="mb-12 pb-8">
+                    {/* Bottom: Glass-Red Button (Premium Redesign) */}
+                    <div className="mb-8 w-full max-w-xs px-4">
                         <button
-                            onClick={onClose}
-                            className="px-6 py-3 rounded-full border border-red-500/30 bg-red-500/10 text-red-300 font-bold text-sm tracking-wide hover:bg-red-500/20 active:scale-95 transition-all"
+                            onClick={handleClose}
+                            className="w-full py-4 rounded-full border border-red-500/30 bg-red-500/5 text-red-500/90 font-light tracking-widest uppercase text-xs hover:bg-red-500/10 active:scale-95 transition-all shadow-lg backdrop-blur-sm"
                         >
                             End Session Early
                         </button>

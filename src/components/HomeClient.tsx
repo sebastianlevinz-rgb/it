@@ -15,12 +15,28 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
     const [showBreathe, setShowBreathe] = useState(false);
     const [isCravingModalOpen, setIsCravingModalOpen] = useState(false);
     const [levelInfo, setLevelInfo] = useState<LevelInfo | null>(null);
+    const [triggerXPGlow, setTriggerXPGlow] = useState(false);
 
     useEffect(() => {
-        getUserXP().then(xp => {
+        const fetchXP = async () => {
+            const xp = await getUserXP();
             setLevelInfo(getLevelInfo(xp));
-        });
+        };
+        fetchXP();
     }, []);
+
+    // Handle Session Complete (Show Glow)
+    const handleSessionComplete = (isSuccess: boolean) => {
+        if (isSuccess) {
+            setTriggerXPGlow(true);
+            setTimeout(() => setTriggerXPGlow(false), 3000);
+
+            // Refresh level info
+            getUserXP().then(xp => {
+                setLevelInfo(getLevelInfo(xp));
+            });
+        }
+    };
 
     return (
         <main className="h-[100svh] max-h-[100svh] px-4 pt-4 pb-24 flex flex-col font-sans max-w-md mx-auto relative bg-gradient-to-br from-[#0a0a12] via-[#161625] to-black overflow-hidden font-medium text-slate-200 animate-living-gradient">
@@ -32,7 +48,12 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
             <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
 
             {/* Breathe Modal */}
-            {showBreathe && <BreatheModal onClose={() => setShowBreathe(false)} />}
+            {showBreathe && (
+                <BreatheModal
+                    onClose={() => setShowBreathe(false)}
+                    onSessionComplete={handleSessionComplete}
+                />
+            )}
 
             {/* Header - Compact & Centered */}
             <header className="mb-2 mt-4 flex flex-col gap-3 relative z-10 shrink-0">
@@ -48,18 +69,19 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
 
                 {/* XP Bar - Compact (Only show if NO modal is open) */}
                 {levelInfo && !showBreathe && !isCravingModalOpen && (
-                    <div className="bg-[#111214] rounded-xl p-3 border border-white/5 shadow-inner animate-in fade-in slide-in-from-top-2">
+                    <div className={`bg-[#111214] rounded-xl p-3 border shadow-inner animate-in fade-in slide-in-from-top-2 transition-all duration-1000
+                        ${triggerXPGlow ? "shadow-[0_0_40px_rgba(0,255,255,0.4)] border-[#00FFFF]/50 scale-105" : "border-white/5"}`}>
                         <div className="flex justify-between items-end mb-1.5">
                             <div>
-                                <span className="text-[10px] font-bold text-[#5865F2] uppercase tracking-wider">Level {levelInfo.level}</span>
+                                <span className={`text-[10px] font-bold uppercase tracking-wider transition-colors duration-500 ${triggerXPGlow ? "text-[#00FFFF]" : "text-[#5865F2]"}`}>Level {levelInfo.level}</span>
                                 <h3 className="text-white font-bold text-sm leading-none">{levelInfo.title}</h3>
                             </div>
                             <span className="text-[10px] text-gray-500 font-mono">{levelInfo.currentXP}/{levelInfo.nextThreshold}</span>
                         </div>
                         <div className="h-1.5 w-full bg-[#2b2d31] rounded-full overflow-hidden">
                             <div
-                                className="h-full bg-[#5865F2] shadow-[0_0_10px_#5865F2]"
-                                style={{ width: `${levelInfo.progressPercent}%`, transition: 'width 1s ease-out' }}
+                                className={`h-full shadow-[0_0_10px_currentColor] transition-all duration-1000 ${triggerXPGlow ? "bg-[#00FFFF] text-[#00FFFF]" : "bg-[#5865F2] text-[#5865F2]"}`}
+                                style={{ width: `${levelInfo.progressPercent}%` }}
                             />
                         </div>
                     </div>

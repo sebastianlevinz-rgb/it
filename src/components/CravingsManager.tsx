@@ -194,7 +194,7 @@ export default function CravingsManager({ onModalChange }: { onModalChange?: (is
 
                                 <button
                                     onClick={handleEndTimerEarly}
-                                    className="w-full py-4 rounded-full border border-red-500/20 bg-red-500/15 text-red-300 font-bold text-sm tracking-wide hover:bg-red-500/25 active:scale-95 transition-all shadow-[0_0_20px_-5px_rgba(239,68,68,0.2)]"
+                                    className="w-full py-4 rounded-full border border-red-500/30 bg-red-500/5 text-red-500/90 font-light tracking-widest uppercase text-xs hover:bg-red-500/10 active:scale-95 transition-all shadow-lg backdrop-blur-sm"
                                 >
                                     End Session Early
                                 </button>
