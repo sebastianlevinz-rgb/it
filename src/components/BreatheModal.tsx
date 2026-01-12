@@ -136,12 +136,7 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
         startRain();
     };
 
-    // Trigger cycle when activePattern changes
-    useEffect(() => {
-        if (activePattern) {
-            startCycle(activePattern);
-        }
-    }, [activePattern, startCycle]);
+
 
     // Session Timer Logic
     useEffect(() => {
@@ -229,6 +224,13 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
         runPhase("inhale");
 
     }, [playTone]);
+
+    // Trigger cycle when activePattern changes
+    useEffect(() => {
+        if (activePattern) {
+            startCycle(activePattern);
+        }
+    }, [activePattern, startCycle]);
 
     // Cleanup
     useEffect(() => {
