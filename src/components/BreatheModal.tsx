@@ -1,23 +1,50 @@
 "use client";
 
-import { X, Wind, Box, Zap, Heart } from "lucide-react";
+import { X, Wind, Moon } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { logMeditation } from "@/app/actions";
 
 type Phase = "inhale" | "hold" | "exhale" | "hold_empty";
-// Defaulting to a single "Calm" mode for simplicity with the new timers, 
-// or we could allow config. For now, we use a balanced 4-4-4-4 Box or 5-5 Calm.
-// Let's go with "Deep Calm" (5-5) as general purpose.
-const BREATH_CYCLE = { inhale: 4000, hold: 4000, exhale: 4000, hold_empty: 4000 };
 
+type BreathPattern = {
+    id: string;
+    name: string;
+    color: string;
+    cycle: {
+        inhale: number;
+        hold: number;
+        exhale: number;
+        hold_empty: number;
+    };
+};
+
+const PATTERNS: Record<string, BreathPattern> = {
+    box: {
+        id: 'box',
+        name: 'Box Breathing',
+        color: '#38BDF8',
+        cycle: { inhale: 4000, hold: 4000, exhale: 4000, hold_empty: 4000 }
+    },
+    '478': {
+        id: '478',
+        name: '4-7-8 Relax',
+        color: '#818CF8',
+        cycle: { inhale: 4000, hold: 7000, exhale: 8000, hold_empty: 0 }
+    }
+};
 
 export default function BreatheModal({ onClose, onSessionComplete }: { onClose: () => void, onSessionComplete?: (success: boolean) => void }) {
-    const [isActive, setIsActive] = useState(false);
-    const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
-    const [timeLeft, setTimeLeft] = useState<number>(0);
+    const [activePattern, setActivePattern] = useState<BreathPattern | null>(null);
+    const isActive = !!activePattern;
+
+    // Default to 5 mins for now, or could let user pick time. 
+    // For this UI, we start immediately on selection, so let's say 5 min default or open-ended.
+    // We'll set 5 mins.
+    const [durationMinutes, setDurationMinutes] = useState<number>(5);
+    const [timeLeft, setTimeLeft] = useState<number>(5 * 60);
 
     const [phase, setPhase] = useState<Phase>("inhale");
-    const [text, setText] = useState("Ready");
+    const [instruction, setInstruction] = useState("Ready");
 
     const audioCtxRef = useRef<AudioContext | null>(null);
     const rainGainRef = useRef<GainNode | null>(null);
@@ -61,7 +88,7 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
         // Low Pass Filter for "Cozy/Muffled" effect
         const filterNode = ctx.createBiquadFilter();
         filterNode.type = "lowpass";
-        filterNode.frequency.setValueAtTime(800, ctx.currentTime); // 800Hz cutoff removes harsh high-end hiss
+        filterNode.frequency.setValueAtTime(800, ctx.currentTime);
 
         rainSource.connect(gainNode);
         gainNode.connect(filterNode);
@@ -100,13 +127,21 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
         osc.stop(ctx.currentTime + duration);
     }, []);
 
-    const startSession = (minutes: number) => {
-        setDurationMinutes(minutes);
-        setTimeLeft(minutes * 60);
-        setIsActive(true);
+    const startSession = (patternId: string) => {
+        const pattern = PATTERNS[patternId];
+        if (!pattern) return;
+
+        setActivePattern(pattern);
+        setTimeLeft(5 * 60); // Reset to 5 mins
         startRain();
-        startCycle();
     };
+
+    // Trigger cycle when activePattern changes
+    useEffect(() => {
+        if (activePattern) {
+            startCycle(activePattern);
+        }
+    }, [activePattern, startCycle]);
 
     // Session Timer Logic
     useEffect(() => {
@@ -115,7 +150,6 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
         sessionTimerRef.current = setInterval(() => {
             setTimeLeft((prev) => {
                 if (prev <= 1) {
-                    // Session Complete
                     clearInterval(sessionTimerRef.current!);
                     completeSession();
                     return 0;
@@ -127,13 +161,13 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
         return () => {
             if (sessionTimerRef.current) clearInterval(sessionTimerRef.current);
         };
-    }, [isActive]);
+    }, [isActive, timeLeft]);
 
     const completeSession = async () => {
         stopRain();
         if (durationMinutes) {
             await logMeditation(durationMinutes);
-            if (onSessionComplete && durationMinutes >= 15) {
+            if (onSessionComplete && durationMinutes >= 5) {
                 onSessionComplete(true);
             }
         }
@@ -145,8 +179,8 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
         onClose();
     };
 
-    const startCycle = useCallback(() => {
-        const config = BREATH_CYCLE;
+    const startCycle = useCallback((pattern: BreathPattern) => {
+        const config = pattern.cycle;
 
         const runPhase = (currentPhase: Phase) => {
             setPhase(currentPhase);
@@ -159,19 +193,19 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
             switch (currentPhase) {
                 case "inhale":
                     duration = config.inhale;
-                    next = "hold";
+                    next = config.hold > 0 ? "hold" : (config.exhale > 0 ? "exhale" : "inhale");
                     label = "Inhale";
                     tone = 164; // E3
                     break;
                 case "hold":
                     duration = config.hold;
-                    next = "exhale";
+                    next = config.exhale > 0 ? "exhale" : "inhale";
                     label = "Hold";
                     tone = 0;
                     break;
                 case "exhale":
                     duration = config.exhale;
-                    next = "hold_empty";
+                    next = config.hold_empty > 0 ? "hold_empty" : "inhale";
                     label = "Exhale";
                     tone = 110; // A2
                     break;
@@ -183,7 +217,7 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
                     break;
             }
 
-            setText(label);
+            setInstruction(label);
             if (tone > 0) playTone(tone, "sine", duration / 1000);
 
             breathTimerRef.current = setTimeout(() => {
@@ -196,14 +230,7 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
 
     }, [playTone]);
 
-    // Format Time MM:SS
-    const formatTime = (seconds: number) => {
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
-        return `${m}:${s.toString().padStart(2, '0')}`;
-    };
-
-    // CLEANUP
+    // Cleanup
     useEffect(() => {
         return () => {
             if (audioCtxRef.current?.state !== 'closed') {
@@ -214,109 +241,105 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
         }
     }, []);
 
+    const cycleDuration = activePattern ? (phase === 'inhale' ? activePattern.cycle.inhale : phase === 'exhale' ? activePattern.cycle.exhale : activePattern.cycle.hold) : 1000;
+
     return (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#F8F4E3] text-[#2C4C3B] animate-in zoom-in-90 duration-500 overflow-hidden font-serif">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-500">
+            {/* Backdrop - Glass Frost */}
+            <div className="absolute inset-0 bg-white/10 backdrop-blur-xl transition-all duration-1000" />
 
-            {/* Dynamic Background Texture */}
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-multiply pointer-events-none"></div>
+            {/* Modal Content - Floating Glass Panel */}
+            <div className="relative w-full max-w-md aspect-square max-h-[80vh] glass-panel flex flex-col items-center justify-center p-8 text-center animate-in zoom-in-95 duration-500 shadow-[0_8px_32px_rgba(31,38,135,0.1)] border border-white/40">
 
-            <button
-                onClick={handleClose}
-                className="absolute top-6 right-6 p-4 rounded-full hover:bg-[#2C4C3B]/10 text-[#2C4C3B] transition-all z-50"
-            >
-                <X size={32} />
-            </button>
-
-            {!isActive ? (
-                // SELECTION SCREEN
-                <div className="w-full max-w-md p-8 flex flex-col gap-6 animate-in slide-in-from-bottom-10 fade-in duration-500 relative z-10 text-center">
-                    <h2 className="text-4xl font-black mb-6 tracking-tight drop-shadow-sm text-[#2C4C3B]">Take a Moment</h2>
-
-                    <div className="grid grid-cols-1 gap-4">
-                        {[5, 10, 15].map((mins) => (
-                            <button
-                                key={mins}
-                                onClick={() => startSession(mins)}
-                                className="group w-full bg-white border-2 border-[#2C4C3B]/20 hover:border-[#A3C5A3] p-6 rounded-[24px] transition-all hover-lift active-squish flex items-center justify-between shadow-sm hover:shadow-md"
-                            >
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-[#A3C5A3]/20 rounded-full text-[#2C4C3B] group-hover:bg-[#A3C5A3] group-hover:text-[#1a2f23] transition-colors">
-                                        <Wind size={24} />
-                                    </div>
-                                    <span className="font-bold text-2xl text-[#2C4C3B]">{mins} Min</span>
-                                </div>
-                                <span className="text-sm font-medium text-[#5D4037] group-hover:text-[#2C4C3B] transition-colors">Start &rarr;</span>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            ) : (
-                // ACTIVE BREATHING SCREEN (FLEXBOX CENTERED)
-                <div className="flex flex-col items-center justify-between h-full w-full py-12 relative z-10 min-h-[100dvh]">
-
-                    {/* Top: Timer */}
-                    <div className="text-center mt-12 px-6 py-2 rounded-full border-2 border-[#2C4C3B] bg-[#F8F4E3] z-20">
-                        <span className="font-mono text-xl tracking-widest text-[#2C4C3B] font-bold">{formatTime(timeLeft)}</span>
-                    </div>
-
-                    {/* Center: Breath Visual */}
-                    <div className="flex-1 flex flex-col items-center justify-center relative w-full">
-                        {/* Organic Watercolor Pulse */}
-                        <div
-                            className={`rounded-full transition-all ease-in-out absolute
-                            ${phase === "inhale" || phase === "hold" ? "w-[350px] h-[350px] opacity-40" : "w-[200px] h-[200px] opacity-10"}
-                            `}
-                            style={{
-                                backgroundColor: '#A3C5A3',
-                                borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
-                                transitionDuration: `${phase === 'inhale' ? BREATH_CYCLE.inhale : phase === 'exhale' ? BREATH_CYCLE.exhale : 1000}ms`,
-                                transform: phase === 'inhale' ? 'rotate(10deg) scale(1.1)' : 'rotate(0deg) scale(1)'
-                            }}
-                        />
-
-                        {/* Core Circle */}
-                        <div
-                            className={`rounded-full transition-all ease-in-out absolute border-2 border-[#2C4C3B]
-                            ${phase === "inhale" || phase === "hold" ? "w-[280px] h-[280px] opacity-20" : "w-[150px] h-[150px] opacity-5"}
-                            `}
-                            style={{
-                                transitionDuration: `${phase === 'inhale' ? BREATH_CYCLE.inhale : phase === 'exhale' ? BREATH_CYCLE.exhale : 1000}ms`,
-                                borderRadius: '50% 50% 50% 50% / 50% 50% 50% 50%'
-                            }}
-                        />
-
-                        {/* Geometric Circle Icon */}
-                        <div
-                            className={`z-10 flex items-center justify-center transition-all ease-in-out
-                            ${(phase === "inhale" || phase === "hold") ? "scale-110" : "scale-100"}
-                            mb-8`}
-                            style={{
-                                transitionDuration: `${phase === 'inhale' ? BREATH_CYCLE.inhale : phase === 'exhale' ? BREATH_CYCLE.exhale : 1000}ms`
-                            }}
-                        >
-                            <Wind
-                                size={48}
-                                className={`text-[#2C4C3B] transition-all`}
-                            />
+                {!isActive ? (
+                    <div className="space-y-8 w-full animate-in slide-in-from-bottom-4 fade-in duration-500">
+                        <div>
+                            <h2 className="text-2xl font-light text-[#1A202C] mb-2">Breathe</h2>
+                            <p className="text-[#4A5568] font-light">Choose your rhythm.</p>
                         </div>
 
-                        {/* Text */}
-                        <h2 className="text-5xl font-black tracking-widest uppercase transition-all duration-500 text-[#2C4C3B] absolute font-serif" style={{ top: '65%' }}>
-                            {text}
-                        </h2>
-                    </div>
+                        <div className="grid grid-cols-1 gap-4">
+                            <button
+                                onClick={() => startSession("box")}
+                                className="group btn-glass py-6 px-6 text-left flex items-center justify-between transition-all hover:scale-[1.02]"
+                            >
+                                <div>
+                                    <span className="block font-medium text-[#1A202C]">Box Breathing</span>
+                                    <span className="text-xs text-[#4A5568] font-light">4-4-4-4 • Focus & Calm</span>
+                                </div>
+                                <Wind className="text-[#38BDF8] opacity-60 group-hover:opacity-100 transition-opacity" size={24} strokeWidth={1} />
+                            </button>
 
-                    {/* Bottom: Minimal Ink Button */}
-                    <div className="mb-8 w-full max-w-xs px-4">
+                            <button
+                                onClick={() => startSession("478")}
+                                className="group btn-glass py-6 px-6 text-left flex items-center justify-between transition-all hover:scale-[1.02]"
+                            >
+                                <div>
+                                    <span className="block font-medium text-[#1A202C]">4-7-8 Relax</span>
+                                    <span className="text-xs text-[#4A5568] font-light">4-7-8 • Sleep & Anxiety</span>
+                                </div>
+                                <Moon className="text-[#818CF8] opacity-60 group-hover:opacity-100 transition-opacity" size={24} strokeWidth={1} />
+                            </button>
+                        </div>
+
                         <button
-                            onClick={handleClose}
-                            className="w-full py-4 px-8 mt-5 rounded-full border-2 border-[#2C4C3B] text-[#2C4C3B] font-bold tracking-widest uppercase text-xs hover:bg-[#2C4C3B] hover:text-[#F8F4E3] transition-all"
+                            onClick={onClose}
+                            className="text-[#4A5568] hover:text-[#1A202C] text-sm font-light tracking-wide hover:underline decoration-1 underline-offset-4 transition-colors p-2"
                         >
-                            End Session Early
+                            Cancel
                         </button>
                     </div>
-                </div>
-            )}
+                ) : (
+                    <div className="relative w-full h-full flex flex-col items-center justify-center">
+                        {/* Glowing Halo Pulse */}
+                        <div
+                            className={`rounded-full transition-all ease-in-out absolute blur-2xl
+                            ${phase === "inhale" || phase === "hold" ? "w-[300px] h-[300px] opacity-40" : "w-[200px] h-[200px] opacity-20"}
+                            `}
+                            style={{
+                                backgroundColor: activePattern?.color || '#38BDF8',
+                                transitionDuration: `${cycleDuration}ms`,
+                                boxShadow: `0 0 60px ${activePattern?.color || '#38BDF8'}`
+                            }}
+                        />
+
+                        {/* Core Light Circle */}
+                        <div
+                            className={`rounded-full transition-all ease-in-out absolute border border-white/80 bg-white/20 backdrop-blur-sm
+                            ${phase === "inhale" || phase === "hold" ? "w-[250px] h-[250px]" : "w-[150px] h-[150px]"}
+                            `}
+                            style={{
+                                transitionDuration: `${cycleDuration}ms`,
+                                boxShadow: `inset 0 0 20px rgba(255,255,255,0.5), 0 0 20px ${activePattern?.color || '#38BDF8'}40`
+                            }}
+                        />
+
+                        {/* Geometric Icon */}
+                        <div
+                            className={`relative z-10 transition-all duration-1000 ease-in-out
+                            ${phase === "inhale" ? "scale-110" : "scale-100"}
+                            `}
+                        >
+                            {activePattern?.id === 'box' ?
+                                <Wind size={40} className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]" strokeWidth={1.5} /> :
+                                <Moon size={40} className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]" strokeWidth={1.5} />
+                            }
+                        </div>
+
+                        <div className="absolute bottom-10 flex flex-col items-center space-y-4 z-20">
+                            <p className="text-2xl font-light text-[#1A202C] tracking-widest uppercase" style={{ textShadow: '0 0 20px rgba(255,255,255,0.8)' }}>
+                                {instruction}
+                            </p>
+                            <button
+                                onClick={handleClose}
+                                className="text-xs text-[#4A5568] bg-white/20 hover:bg-white/40 px-4 py-2 rounded-full backdrop-blur-md transition-colors border border-white/30"
+                            >
+                                End Session
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
