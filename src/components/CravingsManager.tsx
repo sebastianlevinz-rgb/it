@@ -69,311 +69,275 @@ export default function CravingsManager({ onModalChange }: { onModalChange?: (is
         }
     }, []);
 
-    useEffect(() => {
-        if (!activeState.isActive || !activeState.startTime) return;
-
-        // Immediate update
-        updateTimer(activeState.startTime);
-
-        timerInterval.current = setInterval(() => {
-            updateTimer(activeState.startTime!);
-        }, 1000);
-
-        return () => {
-            if (timerInterval.current) clearInterval(timerInterval.current);
-        };
-    }, [activeState, updateTimer]);
-
-    const handleEndTimerEarly = async () => {
-        if (!activeState.eventId) return;
-
-        // 1. Stop Timer
-        if (timerInterval.current) clearInterval(timerInterval.current);
-
-        // 2. Determine Effect (Already handled by isGhosting)
-        // const type = activeState.payload?.type;
-
-        // 3. Log Failure & Award Partial XP
-        await logOutcome(activeState.eventId, "consumed");
-        await addXP(5);
-
-        // 4. Delay reset to show animation
-        setTimeout(() => {
-            setActiveState({ isActive: false });
-            setSelectionMode(null);
-            setIsGhosting(false);
-        }, 600);
+    const checkTimer = async () => {
+        const active = await getActiveTimer();
+        if (active) {
+            setActiveState({ isActive: true, payload: active.payload });
+            const end = new Date(active.endTime).getTime();
+            const now = Date.now();
+            setTimeLeft(Math.max(0, end - now));
+        }
     };
+    checkTimer();
+}, []);
 
-    const handleStartImpulse = async () => {
-        if (!selectionMode) return;
-        // For food, we don't need category/trigger. For weed, we do.
-        if (selectionMode === "weed" && (!category || !specificTrigger)) return;
+// Timer Interval
+useEffect(() => {
+    if (!activeState.isActive || timeLeft === null) return;
+    if (timeLeft <= 0) return;
 
-        setIsSubmitting(true);
-
-        const payload: TriggerPayload = {
-            type: selectionMode,
-            category: selectionMode === "food" ? "enhancement" : category!,
-            specificTrigger: selectionMode === "food" ? "Hunger" : specificTrigger!,
-            foodDetails: selectionMode === "food" ? { hungerLevel, description: foodDesc } : undefined,
-        };
-
-        const event = await logImpulse(payload);
-        setActiveState({
-            isActive: true,
-            startTime: new Date(),
-            eventId: event.id,
-            payload,
+    const interval = setInterval(() => {
+        setTimeLeft(prev => {
+            if (prev !== null && prev <= 1000) return 0;
+            return prev !== null ? prev - 1000 : null;
         });
+    }, 1000);
+    return () => clearInterval(interval);
+}, [activeState.isActive, timeLeft]);
+
+// Handlers
+const handleStartImpulse = async () => {
+    setIsSubmitting(true);
+    const payload = selectionMode === "food"
+        ? { category: "enhancement", trigger: "Hunger", food_desc: foodDesc, hunger_level: hungerLevel }
+        : { category, trigger: specificTrigger };
+
+    await startTimer(selectionMode!, payload);
+
+    setActiveState({ isActive: true, payload: { ...payload, category: selectionMode === "food" ? "enhancement" : category } });
+    setTimeLeft(20 * 60 * 1000);
+    setSelectionMode(null);
+    setIsSubmitting(false);
+};
+
+const handleOutcome = async (outcome: "resisted" | "consumed") => {
+    setIsSubmitting(true);
+    await logOutcome(outcome);
+    setActiveState({ isActive: false, payload: null });
+    setIsSubmitting(false);
+};
+
+const handleEndTimerEarly = async () => {
+    setIsGhosting(true); // Maybe just a hard cut for Swiss
+    setTimeout(async () => {
+        await cancelTimer();
+        setActiveState({ isActive: false, payload: null });
         setSelectionMode(null);
-        setCategory(null);
-        setSpecificTrigger(null);
-        setIsSubmitting(false);
-    };
+        setIsGhosting(false);
+    }, 200);
+};
 
-    const handleOutcome = async (outcome: "consumed" | "resisted") => {
-        if (!activeState.eventId) return;
-        setIsSubmitting(true);
-        await logOutcome(activeState.eventId, outcome);
-        // Logic: You logged the outcome honestly. Award XP.
-        await addXP(5);
-        setActiveState({ isActive: false });
-        setIsSubmitting(false);
-    };
+const formatTime = (ms: number) => {
+    const totalSec = Math.floor(ms / 1000);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+};
 
-    // ---------------- RENDER HELPERS ----------------
 
-    const formatTime = (ms: number) => {
-        const totalSeconds = Math.floor(ms / 1000);
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-        return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-    };
+// 1. ACTIVE TIMER VIEW - SWISS
+if (activeState.isActive && activeState.payload) {
+    const isReady = timeLeft !== null && timeLeft <= 0;
+    const percent = timeLeft !== null ? ((20 * 60 * 1000 - timeLeft) / (20 * 60 * 1000)) * 100 : 0;
 
-    if (activeState.isActive && activeState.payload) {
-        const isReady = timeLeft !== null && timeLeft <= 0;
-        const percent = timeLeft !== null ? ((20 * 60 * 1000 - timeLeft) / (20 * 60 * 1000)) * 100 : 0;
-
-        // Animation Wrapper Classes - Glass Panel
-        const wrapperClass = `col-span-2 glass-panel flex flex-col items-center justify-center relative overflow-hidden transition-all duration-500 w-full min-h-[400px] p-6 pb-12
-            ${isGhosting ? "ghost-out" : ""}
-        `;
-
-        return (
-            <div className={wrapperClass}>
-                {isGhosting && (
-                    <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
-                )}
-                {/* Crystal Progress Bar */}
-                <div className="absolute bottom-6 left-6 right-6 h-2 crystal-tube">
-                    <div
-                        className="h-full liquid-fill transition-all duration-1000 ease-in-out relative rounded-full"
-                        style={{ width: `${percent}%` }}
-                    ></div>
+    return (
+        <div className="w-full h-full flex flex-col swiss-box border-0 !p-0">
+            {/* Header Info */}
+            <div className="border-b-2 border-black p-6 bg-black text-white">
+                <div className="flex justify-between items-center mb-2">
+                    <h2 className="text-xl font-bold uppercase">Timer Active</h2>
+                    {/* Swiss Progress Line */}
+                    <div className="w-24 h-2 bg-white/20">
+                        <div className="h-full bg-white" style={{ width: `${percent}%` }} />
+                    </div>
                 </div>
-
-                <div className="text-center z-10 w-full max-w-md flex-1 flex flex-col justify-center">
-                    {!isReady ? (
-                        <>
-                            <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full border border-white/50 bg-white/20 text-[#1A202C] animate-pulse mx-auto shadow-inner">
-                                <Clock size={32} strokeWidth={1} />
-                            </div>
-                            <h2 className="text-4xl font-light tracking-tighter mb-2 text-[#1A202C]">
-                                {timeLeft !== null ? formatTime(timeLeft) : "--:--"}
-                            </h2>
-                            <p className="text-sm text-[#4A5568] font-light mb-4 max-w-xs mx-auto leading-relaxed uppercase tracking-widest opacity-80">
-                                Awareness is the key
-                            </p>
-                            <div className="space-y-4 text-xs text-[#4A5568] w-full">
-                                <p>Status: <span className="text-[#1A202C] capitalize font-semibold">{activeState.payload?.category}</span></p>
-
-                                <button
-                                    onClick={handleEndTimerEarly}
-                                    className="w-full py-4 px-8 mt-5 rounded-full border border-red-400/30 bg-red-400/5 text-red-500 font-medium tracking-widest uppercase text-xs hover:bg-red-400/10 active:scale-95 transition-all"
-                                >
-                                    End Session Early
-                                </button>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full border border-white/60 bg-white/30 text-[#38BDF8] shadow-[0_0_20px_rgba(56,189,248,0.3)]">
-                                <CheckCircle size={32} strokeWidth={1} />
-                            </div>
-                            <h2 className="text-2xl font-light mb-4 text-[#1A202C]">Window of Clarity</h2>
-                            <p className="text-[#4A5568] mb-8 font-light">The urge has passed. You are free to choose.</p>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <button
-                                    onClick={() => handleOutcome("resisted")}
-                                    disabled={isSubmitting}
-                                    className="btn-glass py-4 text-sm"
-                                >
-                                    <Leaf size={20} className="text-[#38BDF8]" />
-                                    Resist
-                                </button>
-                                <button
-                                    onClick={() => handleOutcome("consumed")}
-                                    disabled={isSubmitting}
-                                    className="btn-glass py-4 text-sm opacity-70 hover:opacity-100"
-                                >
-                                    <Utensils size={20} className="text-[#F472B6]" />
-                                    Consume
-                                </button>
-                            </div>
-                        </>
-                    )}
-                </div>
+                <p className="font-mono text-xs uppercase opacity-80"> Protocol: {activeState.payload?.category}</p>
             </div>
-        );
-    }
 
-    // 2. TRIGGER SELECTION VIEW
-    if (selectionMode) {
-        const isFood = selectionMode === "food";
+            <div className="flex-1 flex flex-col items-center justify-center p-8 bg-white text-black">
+                {!isReady ? (
+                    <>
+                        <h2 className="text-8xl font-black tracking-tighter mb-4">
+                            {timeLeft !== null ? formatTime(timeLeft) : "--:--"}
+                        </h2>
+                        <p className="text-lg font-bold uppercase tracking-widest mb-12">
+                            Observe The Gap
+                        </p>
 
-        return (
-            <div className="col-span-2 glass-panel animate-in fade-in zoom-in-95 duration-300">
-                <div className="flex items-center justify-between mb-8 border-b border-white/20 pb-4">
-                    <h2 className="text-xl font-light capitalize flex items-center gap-3 text-[#1A202C]">
-                        {isFood ? <Utensils size={24} className="text-[#F472B6]" strokeWidth={1.5} /> : <Leaf size={24} className="text-[#38BDF8]" strokeWidth={1.5} />}
-                        New {selectionMode}
-                    </h2>
-                    <button onClick={() => setSelectionMode(null)} className="p-2 hover:bg-white/20 rounded-full text-[#4A5568] transition-colors">
-                        <X size={20} strokeWidth={1.5} />
-                    </button>
-                </div>
+                        <button
+                            onClick={handleEndTimerEarly}
+                            className="mt-auto w-full btn-swiss-red"
+                        >
+                            <X size={20} strokeWidth={3} />
+                            Abort Session
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <h2 className="text-4xl font-black mb-8 border-b-4 border-black pb-2">ACTION REQUIRED</h2>
+                        <p className="font-medium mb-12 text-center text-lg">The window is open. Execute choice.</p>
 
-                <div className="space-y-8">
-                    {/* CUSTOM FOOD FLOW - HUNGER METER */}
-                    {isFood ? (
-                        <div className="animate-in fade-in slide-in-from-bottom-2">
-                            <div className="mb-8">
-                                <label className="flex justify-between text-sm font-semibold text-[#4A5568] mb-4">
-                                    <span>Hunger Level</span>
-                                    <span className="text-[#1A202C]">{hungerLevel} - {hungerLevel === 1 ? "Just a taste" : hungerLevel >= 8 ? "Starving" : "Hungry"}</span>
-                                </label>
+                        <div className="grid grid-cols-2 gap-4 w-full">
+                            <button
+                                onClick={() => handleOutcome("resisted")}
+                                disabled={isSubmitting}
+                                className="btn-swiss-black py-6 text-lg"
+                            >
+                                <Leaf size={24} />
+                                Resist
+                            </button>
+                            <button
+                                onClick={() => handleOutcome("consumed")}
+                                disabled={isSubmitting}
+                                className="btn-swiss-outline py-6 text-lg"
+                            >
+                                <Utensils size={24} />
+                                Consume
+                            </button>
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+}
+
+// 2. TRIGGER SELECTION VIEW - SWISS
+if (selectionMode) {
+    const isFood = selectionMode === "food";
+
+    return (
+        <div className="w-full h-full bg-white flex flex-col">
+            <div className="border-b-2 border-black p-6 flex justify-between items-center bg-black text-white">
+                <h2 className="text-2xl font-black uppercase flex items-center gap-3">
+                    {isFood ? <Utensils size={28} /> : <Cannabis size={28} />}
+                    {selectionMode} Protocol
+                </h2>
+                <button onClick={() => setSelectionMode(null)} className="hover:text-[#E63946] transition-colors">
+                    <X size={32} strokeWidth={3} />
+                </button>
+            </div>
+
+            <div className="flex-1 p-6 overflow-y-auto">
+                {/* CUSTOM FOOD FLOW - HUNGER METER */}
+                {isFood ? (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+                        <div>
+                            <label className="block text-sm font-black uppercase mb-4">Hunger Level (1-10)</label>
+                            <div className="flex items-center gap-4">
                                 <input
-                                    type="range"
+                                    type="number"
                                     min="1"
                                     max="10"
                                     value={hungerLevel}
                                     onChange={(e) => setHungerLevel(parseInt(e.target.value))}
-                                    className="w-full accent-[#F472B6] h-1 bg-white/40 rounded-lg appearance-none cursor-pointer"
+                                    className="w-24 h-24 text-4xl font-black text-center border-2 border-black bg-white focus:ring-0 rounded-none"
                                 />
-                                <div className="flex justify-between text-[10px] text-[#A0AEC0] mt-2 font-mono uppercase tracking-wider">
-                                    <span>Just a taste</span>
-                                    <span>Starving</span>
+                                <div className="flex-1 h-4 bg-gray-200 border border-black relative">
+                                    <div className="h-full bg-black" style={{ width: `${hungerLevel * 10}%` }} />
                                 </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-semibold text-[#4A5568] mb-3">What creates this desire?</label>
-                                <input
-                                    type="text"
-                                    value={foodDesc}
-                                    onChange={(e) => setFoodDesc(e.target.value)}
-                                    placeholder="e.g. Pizza, Chocolate..."
-                                    className="w-full bg-white/30 border border-white/50 rounded-xl p-4 text-[#1A202C] placeholder-[#A0AEC0] focus:border-[#F472B6]/50 focus:outline-none transition-colors backdrop-blur-sm"
-                                />
                             </div>
                         </div>
-                    ) : (
-                        /* WEED FLOW - STANDARD CATEGORIES */
-                        <>
-                            {/* Category */}
+
+                        <div>
+                            <label className="block text-sm font-black uppercase mb-4">Target Description</label>
+                            <input
+                                type="text"
+                                value={foodDesc}
+                                onChange={(e) => setFoodDesc(e.target.value)}
+                                placeholder="INPUT DATA..."
+                                className="w-full border-2 border-black p-4 font-mono text-lg uppercase focus:ring-0 focus:border-[#E63946] outline-none rounded-none"
+                            />
+                        </div>
+                    </div>
+                ) : (
+                    /* WEED FLOW - STANDARD CATEGORIES */
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+                        {/* Category */}
+                        <div>
+                            <label className="block text-sm font-black uppercase mb-4">Select Category</label>
+                            <div className="grid grid-cols-2 gap-4">
+                                <button
+                                    onClick={() => setCategory("enhancement")}
+                                    className={`p-6 border-2 border-black font-bold uppercase transition-all rounded-none ${category === "enhancement"
+                                        ? "bg-black text-white"
+                                        : "bg-white text-black hover:bg-gray-100"
+                                        }`}
+                                >
+                                    Enhancement
+                                </button>
+                                <button
+                                    onClick={() => setCategory("avoidance")}
+                                    className={`p-6 border-2 border-black font-bold uppercase transition-all rounded-none ${category === "avoidance"
+                                        ? "bg-black text-white"
+                                        : "bg-white text-black hover:bg-gray-100"
+                                        }`}
+                                >
+                                    Avoidance
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Specific Triggers */}
+                        {category && (
                             <div>
-                                <label className="block text-sm font-semibold text-[#4A5568] mb-3">Category</label>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <button
-                                        onClick={() => setCategory("enhancement")}
-                                        className={`p-4 rounded-2xl border text-center transition-all ${category === "enhancement"
-                                            ? "border-[#38BDF8] bg-[#38BDF8]/10 text-[#0c4a6e]"
-                                            : "border-white/30 bg-white/10 hover:bg-white/20 text-[#4A5568]"
-                                            }`}
-                                    >
-                                        <span className="block font-medium leading-tight" style={{ fontSize: 'clamp(0.8rem, 4vw, 1.125rem)' }}>Enhancement</span>
-                                    </button>
-                                    <button
-                                        onClick={() => setCategory("avoidance")}
-                                        className={`p-4 rounded-2xl border text-center transition-all ${category === "avoidance"
-                                            ? "border-[#F472B6] bg-[#F472B6]/10 text-[#831843]"
-                                            : "border-white/30 bg-white/10 hover:bg-white/20 text-[#4A5568]"
-                                            }`}
-                                    >
-                                        <span className="block font-medium leading-tight" style={{ fontSize: 'clamp(0.8rem, 4vw, 1.125rem)' }}>Avoidance</span>
-                                    </button>
+                                <label className="block text-sm font-black uppercase mb-4">Specific Trigger</label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {(category === "enhancement" ? TRIGGERS_ENHANCEMENT : TRIGGERS_AVOIDANCE).map(t => (
+                                        <button
+                                            key={t}
+                                            onClick={() => setSpecificTrigger(t)}
+                                            className={`p-3 text-sm font-bold border-2 border-black uppercase text-left transition-all rounded-none ${specificTrigger === t
+                                                ? "bg-[#E63946] text-white border-[#E63946]"
+                                                : "bg-white text-black hover:bg-black hover:text-white"
+                                                }`}
+                                        >
+                                            {t}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
-
-                            {/* Specific Triggers */}
-                            {category && (
-                                <div className="animate-in fade-in slide-in-from-top-2">
-                                    <label className="block text-sm font-semibold text-[#4A5568] mb-3">Specific Trigger</label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {(category === "enhancement" ? TRIGGERS_ENHANCEMENT : TRIGGERS_AVOIDANCE).map(t => (
-                                            <button
-                                                key={t}
-                                                onClick={() => setSpecificTrigger(t)}
-                                                className={`px-4 py-2 rounded-full text-xs font-bold border transition-all ${specificTrigger === t
-                                                    ? "bg-[#38BDF8]/20 text-[#0c4a6e] border-[#38BDF8]"
-                                                    : "border-white/30 bg-white/10 text-[#4A5568] hover:bg-white/20"
-                                                    }`}
-                                            >
-                                                {t}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </>
-                    )}
-
-                    {/* Submit */}
-                    <button
-                        disabled={isFood ? isSubmitting : (!category || !specificTrigger || isSubmitting)}
-                        onClick={handleStartImpulse}
-                        className={`w-full font-light py-5 transition-all mt-6 flex items-center justify-center gap-2 shadow-lg backdrop-blur-md rounded-2xl
-                            ${isFood ? "bg-[#F472B6]/80 text-white hover:bg-[#F472B6]" : "bg-[#38BDF8]/80 text-white hover:bg-[#38BDF8]"}`}
-                    >
-                        {isSubmitting ? "Beginning..." : "Start 20m Timer"}
-                        <Clock size={20} fill="none" strokeWidth={2} />
-                    </button>
-
-                </div>
-            </div>
-        );
-    }
-
-    // 3. DASHBOARD CARDS VIEW (DEFAULT - GRID)
-    return (
-        <div className="grid grid-cols-2 gap-5 w-full">
-            {/* Weed Bubble - Glass */}
-            <div className="animate-float" style={{ animationDelay: '0.3s' }}>
-                <div className="btn-glass flex flex-col items-center justify-center gap-3 group relative transition-all duration-300 w-full aspect-square p-4 cursor-pointer !rounded-[32px] hover:bg-white/60"
-                    onClick={() => setSelectionMode("weed")}>
-
-                    <div className="p-3 bg-[#38BDF8]/10 rounded-full text-[#38BDF8] group-hover:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(56,189,248,0.2)]">
-                        <Cannabis size={32} strokeWidth={1.5} />
+                        )}
                     </div>
-
-                    <h2 className="font-light text-lg text-[#1A202C]">Weed</h2>
-                </div>
+                )}
             </div>
 
-            {/* Food Bubble - Glass */}
-            <div className="animate-float" style={{ animationDelay: '0.6s' }}>
-                <div className="btn-glass flex flex-col items-center justify-center gap-3 group relative transition-all duration-300 w-full aspect-square p-4 cursor-pointer !rounded-[32px] hover:bg-white/60"
-                    onClick={() => setSelectionMode("food")}>
-
-                    <div className="p-3 bg-[#F472B6]/10 rounded-full text-[#F472B6] group-hover:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(244,114,182,0.2)]">
-                        <Utensils size={32} strokeWidth={1.5} />
-                    </div>
-
-                    <h2 className="font-light text-lg text-[#1A202C]">Food</h2>
-                </div>
+            {/* Footer Submit */}
+            <div className="p-6 border-t-2 border-black">
+                <button
+                    disabled={isFood ? isSubmitting : (!category || !specificTrigger || isSubmitting)}
+                    onClick={handleStartImpulse}
+                    className="w-full btn-swiss-black py-6 text-xl"
+                >
+                    {isSubmitting ? "PROCESSING..." : "INITIATE TIMER"}
+                    <Clock size={24} />
+                </button>
             </div>
         </div>
     );
+}
+
+// 3. LAUNCHER BUTTONS (If initialSelection is provided via HomeClient)
+if (initialSelection) {
+    // This is a "Dummy" view just to trigger the modal.
+    // The real CravingsManager wrapper above handles the modal state.
+    // Wait, if we use two CravingsManagers, they have separate state.
+    // We'll assume HomeClient mounts ONE manager for the modal, but these buttons triggered it?
+    // Actually, the previous architecture had CravingsManager handle EVERYTHING.
+    // Let's stick to that. If initialSelection props are used, we just render the BUTTON.
+    return (
+        <button
+            onClick={() => setSelectionMode(initialSelection)}
+            className="w-full h-full flex flex-col items-center justify-center gap-4 hover:bg-black hover:text-white transition-all group"
+        >
+            {initialSelection === "weed" ? <Cannabis size={48} strokeWidth={1.5} /> : <Utensils size={48} strokeWidth={1.5} />}
+            <span className="font-extrabold text-2xl uppercase tracking-tighter">{initialSelection}</span>
+            <span className="opacity-0 group-hover:opacity-100 text-xs font-mono transition-opacity">CLICK TO INITIATE</span>
+        </button>
+    );
+}
+
+// Fallback? If no props, render nothing or old view? 
+// In strict Swiss mode, we want the HomeClient to control layout.
+return null;
 }
