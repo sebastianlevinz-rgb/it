@@ -1,9 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Merriweather } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const merriweather = Merriweather({
+  variable: "--font-serif",
+  weight: ["300", "400", "700", "900"],
   subsets: ["latin"],
 });
 
@@ -18,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#121212",
+  themeColor: "#F8F4E3",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -33,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} antialiased bg-background text-foreground font-sans`}
+        className={`${inter.variable} ${merriweather.variable} antialiased bg-background text-foreground font-sans`}
       >
         {children}
       </body>

@@ -25,7 +25,7 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
         fetchXP();
     }, []);
 
-    // Handle Session Complete (Show Glow)
+    // Handle Session Complete (Show Glow - now Ink Pulse)
     const handleSessionComplete = (isSuccess: boolean) => {
         if (isSuccess) {
             setTriggerXPGlow(true);
@@ -39,13 +39,9 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
     };
 
     return (
-        <main className="h-[100svh] max-h-[100svh] px-4 pt-4 pb-24 flex flex-col font-sans max-w-md mx-auto relative bg-gradient-to-br from-[#0a0a12] via-[#161625] to-black overflow-hidden font-medium text-slate-200 animate-living-gradient">
-            {/* Background: Pure Black with Mesh Gradient Blobs - Keep for depth, but adjusted opacity */}
-            <div className="fixed top-[-20%] left-[-20%] w-[500px] h-[500px] bg-[#5865F2]/5 rounded-full blur-[120px] pointer-events-none mix-blend-screen animate-pulse-slow"></div>
-            <div className="fixed bottom-[-20%] right-[-20%] w-[500px] h-[500px] bg-[#57F287]/5 rounded-full blur-[120px] pointer-events-none mix-blend-screen animate-pulse-slow delay-1000"></div>
-
-            {/* Noise Texture */}
-            <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+        <main className="h-[100svh] max-h-[100svh] px-4 pt-4 pb-24 flex flex-col font-sans max-w-md mx-auto relative overflow-hidden font-medium text-foreground bg-[#F8F4E3]">
+            {/* Texture Overlay */}
+            <div className="fixed inset-0 pointer-events-none opacity-[0.05] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-multiply"></div>
 
             {/* Breathe Modal */}
             {showBreathe && (
@@ -59,28 +55,30 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
             <header className="mb-2 mt-4 flex flex-col gap-3 relative z-10 shrink-0">
                 <div className="flex justify-center items-center relative h-10">
                     <div className="text-center z-10">
-                        <h1 className="text-3xl font-black tracking-tighter text-white drop-shadow-sm uppercase leading-none">Impulse</h1>
-                        <p className="text-[#B5BAC1] text-xs font-semibold tracking-wide">The power of the gap</p>
+                        <h1 className="text-3xl font-black tracking-tighter text-foreground drop-shadow-sm uppercase leading-none font-serif">Impulse</h1>
+                        <p className="text-[#5D4037] text-xs font-serif italic tracking-wide">Volume I: The Power of the Gap</p>
                     </div>
-                    <Link href="/settings" className="absolute right-0 top-1/2 -translate-y-1/2 p-2 hover:bg-white/10 rounded-full text-[#B5BAC1] hover:text-white transition-colors active-squish">
-                        <Settings size={20} strokeWidth={2.5} />
+                    <Link href="/settings" className="absolute right-0 top-1/2 -translate-y-1/2 p-2 hover:bg-[#2C4C3B]/5 rounded-full text-[#5D4037] transition-colors active-squish">
+                        <Settings size={20} strokeWidth={2} />
                     </Link>
                 </div>
 
-                {/* XP Bar - Compact (Only show if NO modal is open) */}
+                {/* XP Bar - Botanical Vine Style */}
                 {levelInfo && !showBreathe && !isCravingModalOpen && (
-                    <div className={`bg-[#111214] rounded-xl p-3 border shadow-inner animate-in fade-in slide-in-from-top-2 transition-all duration-1000
-                        ${triggerXPGlow ? "shadow-[0_0_40px_rgba(0,255,255,0.4)] border-[#00FFFF]/50 scale-105" : "border-white/5"}`}>
+                    <div className={`organic-card py-2 px-3 border-2 border-[#2C4C3B] rounded-[12px] bg-white/50 animate-in fade-in slide-in-from-top-2 transition-all duration-1000
+                        ${triggerXPGlow ? "organic-ripple" : ""}`}>
                         <div className="flex justify-between items-end mb-1.5">
                             <div>
-                                <span className={`text-[10px] font-bold uppercase tracking-wider transition-colors duration-500 ${triggerXPGlow ? "text-[#00FFFF]" : "text-[#5865F2]"}`}>Level {levelInfo.level}</span>
-                                <h3 className="text-white font-bold text-sm leading-none">{levelInfo.title}</h3>
+                                <span className={`text-[10px] font-bold uppercase tracking-wider transition-colors duration-500 text-[#5D4037] font-serif`}>Level {levelInfo.level}</span>
+                                <h3 className="text-[#2C4C3B] font-bold text-sm leading-none font-serif">{levelInfo.title}</h3>
                             </div>
-                            <span className="text-[10px] text-gray-500 font-mono">{levelInfo.currentXP}/{levelInfo.nextThreshold}</span>
+                            <span className="text-[10px] text-[#5D4037] font-mono">{levelInfo.currentXP}/{levelInfo.nextThreshold}</span>
                         </div>
-                        <div className="h-1.5 w-full bg-[#2b2d31] rounded-full overflow-hidden">
+                        {/* The Vine Container */}
+                        <div className="h-2 w-full bg-[#E6DDC6] rounded-full overflow-hidden border border-[#2C4C3B]/20 relative">
+                            {/* The Vine Growth */}
                             <div
-                                className={`h-full shadow-[0_0_10px_currentColor] transition-all duration-1000 ${triggerXPGlow ? "bg-[#00FFFF] text-[#00FFFF]" : "bg-[#5865F2] text-[#5865F2]"}`}
+                                className={`h-full vine-growth transition-all duration-1000 ${triggerXPGlow ? "bg-[#2C4C3B]" : "bg-[#2C4C3B]"}`}
                                 style={{ width: `${levelInfo.progressPercent}%` }}
                             />
                         </div>
@@ -91,15 +89,15 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
             {/* The Vibe Space - Centered Action Cluster */}
             <div className={`flex-1 flex flex-col justify-center gap-6 w-full max-w-[320px] mx-auto z-10 relative transition-all duration-500 ${!levelInfo || showBreathe || isCravingModalOpen ? '-mt-12' : ''}`}>
 
-                {/* Breathe Pill - Floating & Rounded (Hide if Cravings Open to reduce clutter?) No, keep it reachable but maybe smaller? actually sticking to plan: just hide XP bar */}
+                {/* 'Take a Moment' - Sage Green Pebble */}
                 {!isCravingModalOpen && (
                     <button
                         onClick={() => setShowBreathe(true)}
-                        className="w-full relative flex items-center justify-between px-8 py-5 transition-all group rounded-[50px] bg-[#2b2d31]/80 backdrop-blur-xl hover:bg-[#313338] active-squish border border-white/5 animate-float-gentle shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5),0_0_20px_rgba(255,255,255,0.05)_inset]"
+                        className="btn-sage w-full group animate-float"
                     >
-                        <span className="font-bold text-lg text-white group-hover:text-[#5865F2] transition-colors">Take a Moment</span>
-                        <div className="bg-[#5865F2]/20 p-2 rounded-full text-[#5865F2] group-hover:rotate-180 transition-transform duration-700">
-                            <Wind size={20} strokeWidth={3} />
+                        <span className="font-bold text-lg text-[#1a2f23]">Take a Moment</span>
+                        <div className="text-[#1a2f23] group-hover:rotate-12 transition-transform duration-700">
+                            <Wind size={20} strokeWidth={2.5} />
                         </div>
                     </button>
                 )}

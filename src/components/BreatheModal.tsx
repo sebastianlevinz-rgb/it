@@ -215,28 +215,14 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
     }, []);
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-950 text-white animate-in zoom-in-90 duration-500 overflow-hidden">
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#F8F4E3] text-[#2C4C3B] animate-in zoom-in-90 duration-500 overflow-hidden font-serif">
 
-            {/* Dynamic Background Glow */}
-            <div
-                className={`absolute inset-0 bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-black transition-all duration-[4000ms]`}
-            >
-                {/* Breathing Pulse Overlay */}
-                {isActive && (
-                    <div
-                        className="absolute inset-0 bg-[#3B82F6]/10 mix-blend-screen transition-all ease-in-out"
-                        style={{
-                            opacity: phase === 'inhale' ? 0.4 : 0.1,
-                            transform: `scale(${phase === 'inhale' ? 1.1 : 1})`,
-                            transitionDuration: `${phase === 'inhale' ? BREATH_CYCLE.inhale : phase === 'exhale' ? BREATH_CYCLE.exhale : 1000}ms`
-                        }}
-                    />
-                )}
-            </div>
+            {/* Dynamic Background Texture */}
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-multiply pointer-events-none"></div>
 
             <button
                 onClick={handleClose}
-                className="absolute top-6 right-6 p-4 rounded-full bg-white/10 text-white/50 hover:bg-white/20 hover:text-white transition-all z-50"
+                className="absolute top-6 right-6 p-4 rounded-full hover:bg-[#2C4C3B]/10 text-[#2C4C3B] transition-all z-50"
             >
                 <X size={32} />
             </button>
@@ -244,22 +230,22 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
             {!isActive ? (
                 // SELECTION SCREEN
                 <div className="w-full max-w-md p-8 flex flex-col gap-6 animate-in slide-in-from-bottom-10 fade-in duration-500 relative z-10 text-center">
-                    <h2 className="text-4xl font-black mb-6 tracking-tight drop-shadow-lg">Take a Moment</h2>
+                    <h2 className="text-4xl font-black mb-6 tracking-tight drop-shadow-sm text-[#2C4C3B]">Take a Moment</h2>
 
                     <div className="grid grid-cols-1 gap-4">
                         {[5, 10, 15].map((mins) => (
                             <button
                                 key={mins}
                                 onClick={() => startSession(mins)}
-                                className="group w-full bg-white/5 hover:bg-white/10 p-6 rounded-[24px] border border-white/5 transition-all hover-lift active-squish flex items-center justify-between"
+                                className="group w-full bg-white border-2 border-[#2C4C3B]/20 hover:border-[#A3C5A3] p-6 rounded-[24px] transition-all hover-lift active-squish flex items-center justify-between shadow-sm hover:shadow-md"
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-blue-500/20 rounded-full text-blue-400 group-hover:bg-blue-500/30 transition-colors">
+                                    <div className="p-3 bg-[#A3C5A3]/20 rounded-full text-[#2C4C3B] group-hover:bg-[#A3C5A3] group-hover:text-[#1a2f23] transition-colors">
                                         <Wind size={24} />
                                     </div>
-                                    <span className="font-bold text-2xl">{mins} Min</span>
+                                    <span className="font-bold text-2xl text-[#2C4C3B]">{mins} Min</span>
                                 </div>
-                                <span className="text-sm font-medium text-white/40 group-hover:text-white/80 transition-colors">Start &rarr;</span>
+                                <span className="text-sm font-medium text-[#5D4037] group-hover:text-[#2C4C3B] transition-colors">Start &rarr;</span>
                             </button>
                         ))}
                     </div>
@@ -269,49 +255,62 @@ export default function BreatheModal({ onClose, onSessionComplete }: { onClose: 
                 <div className="flex flex-col items-center justify-between h-full w-full py-12 relative z-10 min-h-[100dvh]">
 
                     {/* Top: Timer */}
-                    <div className="text-center opacity-80 mt-12 bg-black/20 px-6 py-2 rounded-full border border-white/5 backdrop-blur-sm">
-                        <span className="font-mono text-xl tracking-widest">{formatTime(timeLeft)}</span>
+                    <div className="text-center mt-12 px-6 py-2 rounded-full border-2 border-[#2C4C3B] bg-[#F8F4E3] z-20">
+                        <span className="font-mono text-xl tracking-widest text-[#2C4C3B] font-bold">{formatTime(timeLeft)}</span>
                     </div>
 
                     {/* Center: Breath Visual */}
                     <div className="flex-1 flex flex-col items-center justify-center relative w-full">
-                        {/* Core Pulse */}
+                        {/* Organic Watercolor Pulse */}
                         <div
-                            className={`rounded-full blur-[80px] transition-all ease-in-out bg-blue-500/30 absolute
-                            ${phase === "inhale" || phase === "hold" ? "w-[400px] h-[400px] opacity-60" : "w-[200px] h-[200px] opacity-20"}
+                            className={`rounded-full transition-all ease-in-out absolute
+                            ${phase === "inhale" || phase === "hold" ? "w-[350px] h-[350px] opacity-40" : "w-[200px] h-[200px] opacity-10"}
                             `}
-                            style={{ transitionDuration: `${phase === 'inhale' ? BREATH_CYCLE.inhale : phase === 'exhale' ? BREATH_CYCLE.exhale : 1000}ms` }}
+                            style={{
+                                backgroundColor: '#A3C5A3',
+                                borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+                                transitionDuration: `${phase === 'inhale' ? BREATH_CYCLE.inhale : phase === 'exhale' ? BREATH_CYCLE.exhale : 1000}ms`,
+                                transform: phase === 'inhale' ? 'rotate(10deg) scale(1.1)' : 'rotate(0deg) scale(1)'
+                            }}
                         />
 
-                        {/* Geometric Circle */}
+                        {/* Core Circle */}
                         <div
-                            className={`z-10 flex items-center justify-center transition-all ease-in-out border border-white/20
-                            ${(phase === "inhale" || phase === "hold") ? "w-64 h-64 bg-white/5 scale-100 shadow-[0_0_50px_rgba(59,130,246,0.5)]" : "w-32 h-32 bg-transparent scale-75 shadow-none"}
-                            rounded-full mb-8`}
+                            className={`rounded-full transition-all ease-in-out absolute border-2 border-[#2C4C3B]
+                            ${phase === "inhale" || phase === "hold" ? "w-[280px] h-[280px] opacity-20" : "w-[150px] h-[150px] opacity-5"}
+                            `}
+                            style={{
+                                transitionDuration: `${phase === 'inhale' ? BREATH_CYCLE.inhale : phase === 'exhale' ? BREATH_CYCLE.exhale : 1000}ms`,
+                                borderRadius: '50% 50% 50% 50% / 50% 50% 50% 50%'
+                            }}
+                        />
+
+                        {/* Geometric Circle Icon */}
+                        <div
+                            className={`z-10 flex items-center justify-center transition-all ease-in-out
+                            ${(phase === "inhale" || phase === "hold") ? "scale-110" : "scale-100"}
+                            mb-8`}
                             style={{
                                 transitionDuration: `${phase === 'inhale' ? BREATH_CYCLE.inhale : phase === 'exhale' ? BREATH_CYCLE.exhale : 1000}ms`
                             }}
                         >
                             <Wind
                                 size={48}
-                                className={`text-white transition-all
-                                ${phase === "exhale" ? "opacity-50 scale-75" : "opacity-100 scale-110"}
-                                `}
-                                style={{ transitionDuration: `${phase === 'inhale' ? BREATH_CYCLE.inhale : phase === 'exhale' ? BREATH_CYCLE.exhale : 1000}ms` }}
+                                className={`text-[#2C4C3B] transition-all`}
                             />
                         </div>
 
-                        {/* Text (Perfectly Centered via Flex parent) */}
-                        <h2 className="text-5xl font-black tracking-widest uppercase transition-all duration-500 drop-shadow-xl text-blue-100 absolute" style={{ top: '65%' }}>
+                        {/* Text */}
+                        <h2 className="text-5xl font-black tracking-widest uppercase transition-all duration-500 text-[#2C4C3B] absolute font-serif" style={{ top: '65%' }}>
                             {text}
                         </h2>
                     </div>
 
-                    {/* Bottom: Glass-Red Button (Premium Redesign) */}
+                    {/* Bottom: Minimal Ink Button */}
                     <div className="mb-8 w-full max-w-xs px-4">
                         <button
                             onClick={handleClose}
-                            className="w-full py-4 px-8 mt-5 rounded-full border border-red-500/30 bg-red-500/5 text-red-500/90 font-medium tracking-widest uppercase text-xs hover:bg-red-500/10 active:scale-95 transition-all shadow-lg backdrop-blur-sm"
+                            className="w-full py-4 px-8 mt-5 rounded-full border-2 border-[#2C4C3B] text-[#2C4C3B] font-bold tracking-widest uppercase text-xs hover:bg-[#2C4C3B] hover:text-[#F8F4E3] transition-all"
                         >
                             End Session Early
                         </button>
