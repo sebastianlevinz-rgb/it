@@ -194,9 +194,9 @@ export default function CravingsManager({ onModalChange }: { onModalChange?: (is
 
                                 <button
                                     onClick={handleEndTimerEarly}
-                                    className="text-xs text-red-400 hover:text-red-500 transition-colors mt-4 underline decoration-dotted"
+                                    className="w-full py-3 rounded-full border border-red-500/20 bg-red-500/10 text-red-400 font-bold text-sm tracking-wide hover:bg-red-500/20 active:scale-95 transition-all mt-6 shadow-[0_0_15px_-5px_rgba(239,68,68,0.3)]"
                                 >
-                                    End Timer (Give In)
+                                    End Session Early
                                 </button>
                             </div>
                         </>
@@ -297,7 +297,7 @@ export default function CravingsManager({ onModalChange }: { onModalChange?: (is
                                             : "border-white/5 bg-black/20 hover:bg-white/5 text-zinc-400"
                                             }`}
                                     >
-                                        <span className="block font-bold text-lg">Enhancement</span>
+                                        <span className="block font-bold leading-tight" style={{ fontSize: 'clamp(0.8rem, 4vw, 1.125rem)' }}>Enhancement</span>
                                     </button>
                                     <button
                                         onClick={() => setCategory("avoidance")}
@@ -306,7 +306,7 @@ export default function CravingsManager({ onModalChange }: { onModalChange?: (is
                                             : "border-white/5 bg-black/20 hover:bg-white/5 text-zinc-400"
                                             }`}
                                     >
-                                        <span className="block font-bold text-lg">Avoidance</span>
+                                        <span className="block font-bold leading-tight" style={{ fontSize: 'clamp(0.8rem, 4vw, 1.125rem)' }}>Avoidance</span>
                                     </button>
                                 </div>
                             </div>
