@@ -37,7 +37,7 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
 
         // Soft Attack and Release (Bowl sound)
         gain.gain.setValueAtTime(0, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.9, ctx.currentTime + 1); // Attack
+        gain.gain.linearRampToValueAtTime(1.0, ctx.currentTime + 1); // Attack
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration); // Release
 
         osc.connect(gain);

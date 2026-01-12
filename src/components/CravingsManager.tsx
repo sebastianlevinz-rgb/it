@@ -156,7 +156,7 @@ export default function CravingsManager({ onModalChange }: { onModalChange?: (is
         const percent = timeLeft !== null ? ((20 * 60 * 1000 - timeLeft) / (20 * 60 * 1000)) * 100 : 0;
 
         // Animation Wrapper Classes
-        const wrapperClass = `col-span-2 rounded-[40px] flex flex-col items-center justify-center relative overflow-hidden bg-[#2b2d31]/90 backdrop-blur-xl border border-white/5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.7),0_0_30px_rgba(0,0,0,0.2)_inset] transition-all duration-500 w-full aspect-[4/3] p-6
+        const wrapperClass = `col-span-2 rounded-[40px] flex flex-col items-center justify-center relative overflow-hidden bg-[#2b2d31]/90 backdrop-blur-xl border border-white/5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.7),0_0_30px_rgba(0,0,0,0.2)_inset] transition-all duration-500 w-full min-h-[400px] p-6 pb-12
             ${isGhosting ? "ghost-out" : ""}
         `;
 
@@ -177,10 +177,10 @@ export default function CravingsManager({ onModalChange }: { onModalChange?: (is
                     </div>
                 </div>
 
-                <div className="text-center z-10 w-full max-w-md">
+                <div className="text-center z-10 w-full max-w-md flex-1 flex flex-col justify-center">
                     {!isReady ? (
                         <>
-                            <div className="mb-2 inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary animate-pulse">
+                            <div className="mb-2 inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary animate-pulse mx-auto">
                                 <Clock size={32} />
                             </div>
                             <h2 className="text-4xl font-bold font-numeric mb-2 text-primary">
@@ -189,12 +189,12 @@ export default function CravingsManager({ onModalChange }: { onModalChange?: (is
                             <p className="text-sm text-foreground/80 font-medium mb-4 max-w-xs mx-auto leading-relaxed">
                                 You’re deciding to wait.
                             </p>
-                            <div className="space-y-2 text-xs text-muted-foreground">
+                            <div className="space-y-4 text-xs text-muted-foreground w-full">
                                 <p>Status: <span className="text-foreground capitalize font-bold">{activeState.payload?.category}</span></p>
 
                                 <button
                                     onClick={handleEndTimerEarly}
-                                    className="w-full py-3 rounded-full border border-red-500/20 bg-red-500/10 text-red-400 font-bold text-sm tracking-wide hover:bg-red-500/20 active:scale-95 transition-all mt-6 shadow-[0_0_15px_-5px_rgba(239,68,68,0.3)]"
+                                    className="w-full py-4 rounded-full border border-red-500/20 bg-red-500/15 text-red-300 font-bold text-sm tracking-wide hover:bg-red-500/25 active:scale-95 transition-all shadow-[0_0_20px_-5px_rgba(239,68,68,0.2)]"
                                 >
                                     End Session Early
                                 </button>
