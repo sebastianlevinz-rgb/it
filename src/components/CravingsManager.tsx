@@ -5,10 +5,10 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { logImpulse, getActiveImpulseState, logOutcome, addXP, type TriggerPayload, type ActiveState } from "@/app/actions";
 import confetti from "canvas-confetti";
 
-const TRIGGERS_ENHANCEMENT = ["Music", "Movies", "Gaming", "Age of Empires", "Socializing", "Sex", "Creativity", "Nature", "Chocolate"];
-const TRIGGERS_AVOIDANCE = ["Boredom", "Stress", "Anxiety", "Sadness", "Loneliness", "Tiredness", "Procrastination", "Late-night Snacking"];
+const TRIGGERS_ENHANCEMENT = ["Music", "Movies", "Gaming", "Socializing", "Creativity"];
+const TRIGGERS_AVOIDANCE = ["Stress", "Boredom", "Anxiety", "Fatigue", "Loneliness"];
 
-export default function CravingsManager() {
+export default function CravingsManager({ onModalChange }: { onModalChange?: (isOpen: boolean) => void }) {
     const [activeState, setActiveState] = useState<ActiveState>({ isActive: false });
     const [selectionMode, setSelectionMode] = useState<"weed" | "food" | null>(null);
 
@@ -23,6 +23,13 @@ export default function CravingsManager() {
     const [timeLeft, setTimeLeft] = useState<number | null>(null);
     const [isGhosting, setIsGhosting] = useState(false);
     const timerInterval = useRef<NodeJS.Timeout | null>(null);
+
+    // Sync Modal State with Parent
+    useEffect(() => {
+        if (onModalChange) {
+            onModalChange(!!selectionMode);
+        }
+    }, [selectionMode, onModalChange]);
 
     // Load initial state
     useEffect(() => {
@@ -285,23 +292,21 @@ export default function CravingsManager() {
                                 <div className="grid grid-cols-2 gap-3">
                                     <button
                                         onClick={() => setCategory("enhancement")}
-                                        className={`p-4 rounded-2xl border text-left transition-all ${category === "enhancement"
+                                        className={`p-4 rounded-2xl border text-center transition-all ${category === "enhancement"
                                             ? "border-[#57F287] bg-[#57F287]/10 text-[#57F287]"
                                             : "border-white/5 bg-black/20 hover:bg-white/5 text-zinc-400"
                                             }`}
                                     >
-                                        <span className="block font-bold mb-1">Enhancement</span>
-                                        <span className="text-xs opacity-70 leading-tight">To make things better (Music, Ritual)</span>
+                                        <span className="block font-bold text-lg">Enhancement</span>
                                     </button>
                                     <button
                                         onClick={() => setCategory("avoidance")}
-                                        className={`p-4 rounded-2xl border text-left transition-all ${category === "avoidance"
+                                        className={`p-4 rounded-2xl border text-center transition-all ${category === "avoidance"
                                             ? "border-[#57F287] bg-[#57F287]/10 text-[#57F287]"
                                             : "border-white/5 bg-black/20 hover:bg-white/5 text-zinc-400"
                                             }`}
                                     >
-                                        <span className="block font-bold mb-1">Avoidance</span>
-                                        <span className="text-xs opacity-70 leading-tight">To escape feelings (Stress, Boredom)</span>
+                                        <span className="block font-bold text-lg">Avoidance</span>
                                     </button>
                                 </div>
                             </div>

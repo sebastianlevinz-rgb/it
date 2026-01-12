@@ -244,7 +244,7 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
                     </div>
 
                     {/* Bottom: Ghost Button */}
-                    <div className="mb-8">
+                    <div className="mb-12 pb-8">
                         <button
                             onClick={onClose}
                             className="px-6 py-3 rounded-full border border-red-500/30 bg-red-500/10 text-red-300 font-bold text-sm tracking-wide hover:bg-red-500/20 active:scale-95 transition-all"

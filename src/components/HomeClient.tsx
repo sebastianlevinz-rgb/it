@@ -13,6 +13,7 @@ import { getLevelInfo, type LevelInfo } from "@/utils/xp";
 
 export default function HomeClient({ agencyScore }: { agencyScore: number | null }) {
     const [showBreathe, setShowBreathe] = useState(false);
+    const [isCravingModalOpen, setIsCravingModalOpen] = useState(false);
     const [levelInfo, setLevelInfo] = useState<LevelInfo | null>(null);
 
     useEffect(() => {
@@ -45,9 +46,9 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
                     </Link>
                 </div>
 
-                {/* XP Bar - Compact */}
-                {levelInfo && (
-                    <div className="bg-[#111214] rounded-xl p-3 border border-white/5 shadow-inner">
+                {/* XP Bar - Compact (Only show if NO modal is open) */}
+                {levelInfo && !showBreathe && !isCravingModalOpen && (
+                    <div className="bg-[#111214] rounded-xl p-3 border border-white/5 shadow-inner animate-in fade-in slide-in-from-top-2">
                         <div className="flex justify-between items-end mb-1.5">
                             <div>
                                 <span className="text-[10px] font-bold text-[#5865F2] uppercase tracking-wider">Level {levelInfo.level}</span>
@@ -66,22 +67,24 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
             </header>
 
             {/* The Vibe Space - Centered Action Cluster */}
-            <div className="flex-1 flex flex-col justify-center gap-6 w-full max-w-[320px] mx-auto z-10 relative">
+            <div className={`flex-1 flex flex-col justify-center gap-6 w-full max-w-[320px] mx-auto z-10 relative transition-all duration-500 ${!levelInfo || showBreathe || isCravingModalOpen ? '-mt-12' : ''}`}>
 
-                {/* Breathe Pill - Floating & Rounded */}
-                <button
-                    onClick={() => setShowBreathe(true)}
-                    className="w-full relative flex items-center justify-between px-8 py-5 transition-all group rounded-[50px] bg-[#2b2d31]/80 backdrop-blur-xl hover:bg-[#313338] active-squish border border-white/5 animate-float-gentle shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5),0_0_20px_rgba(255,255,255,0.05)_inset]"
-                >
-                    <span className="font-bold text-lg text-white group-hover:text-[#5865F2] transition-colors">Take a Moment</span>
-                    <div className="bg-[#5865F2]/20 p-2 rounded-full text-[#5865F2] group-hover:rotate-180 transition-transform duration-700">
-                        <Wind size={20} strokeWidth={3} />
-                    </div>
-                </button>
+                {/* Breathe Pill - Floating & Rounded (Hide if Cravings Open to reduce clutter?) No, keep it reachable but maybe smaller? actually sticking to plan: just hide XP bar */}
+                {!isCravingModalOpen && (
+                    <button
+                        onClick={() => setShowBreathe(true)}
+                        className="w-full relative flex items-center justify-between px-8 py-5 transition-all group rounded-[50px] bg-[#2b2d31]/80 backdrop-blur-xl hover:bg-[#313338] active-squish border border-white/5 animate-float-gentle shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5),0_0_20px_rgba(255,255,255,0.05)_inset]"
+                    >
+                        <span className="font-bold text-lg text-white group-hover:text-[#5865F2] transition-colors">Take a Moment</span>
+                        <div className="bg-[#5865F2]/20 p-2 rounded-full text-[#5865F2] group-hover:rotate-180 transition-transform duration-700">
+                            <Wind size={20} strokeWidth={3} />
+                        </div>
+                    </button>
+                )}
 
                 {/* Grid Container */}
                 <div className="w-full">
-                    <CravingsManager />
+                    <CravingsManager onModalChange={setIsCravingModalOpen} />
                 </div>
             </div>
 
