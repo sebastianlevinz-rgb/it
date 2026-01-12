@@ -122,63 +122,63 @@ export default function CravingsManager({ onModalChange, initialSelection }: { o
         return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     };
 
-    // 1. ACTIVE TIMER VIEW - SNES BATTLE
+    // 1. ACTIVE TIMER VIEW - MARIO STYLE
     if (activeState.isActive && activeState.payload) {
         const isReady = timeLeft !== null && timeLeft <= 0;
         const percent = timeLeft !== null ? ((20 * 60 * 1000 - timeLeft) / (20 * 60 * 1000)) * 100 : 0;
 
         return (
-            <div className="w-full h-full flex flex-col bg-black border-4 border-white pixel-border !p-0">
+            <div className="w-full h-full flex flex-col mario-question !p-0">
                 {/* Header Info */}
-                <div className="border-b-4 border-white p-4 bg-gray-900 text-white scanline">
+                <div className="border-b-4 border-black p-4 bg-yellow-400 text-black">
                     <div className="flex justify-between items-center mb-2">
-                        <h2 className="text-sm font-retro text-red-500 animate-pulse">BATTLE ACTIVE</h2>
-                        {/* HP Bar Style */}
-                        <div className="w-24 h-4 bg-gray-700 border-2 border-white relative">
-                            <div className="h-full bg-green-500" style={{ width: `${percent}%` }} />
+                        <h2 className="text-sm font-retro animate-pulse">TIMER ACTIVE</h2>
+                        <div className="w-24 h-4 bg-black/20 border-2 border-black relative">
+                            <div className="h-full bg-red-500" style={{ width: `${percent}%` }} />
                         </div>
                     </div>
+                    <p className="font-mono text-[10px] uppercase">PROTOCOL: {activeState.payload?.category}</p>
                 </div>
 
-                <div className="flex-1 flex flex-col items-center justify-center p-8 bg-black text-white">
+                <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#fcd0a1] text-black">
                     {!isReady ? (
                         <>
-                            <h2 className="text-5xl font-retro mb-4 text-white drop-shadow-[4px_4px_0_rgba(100,100,100,1)]">
+                            <h2 className="text-5xl font-retro mb-4 text-black drop-shadow-sm">
                                 {timeLeft !== null ? formatTime(timeLeft) : "--:--"}
                             </h2>
-                            <p className="text-xs font-retro text-gray-400 mb-12 text-center leading-relaxed">
-                                ENEMY IS CHARGING...<br />HOLD THE LINE!
+                            <p className="text-xs font-retro mb-12 text-center leading-relaxed">
+                                OBSERVE THE GAP...
                             </p>
 
                             <button
                                 onClick={handleEndTimerEarly}
-                                className="mt-auto w-full pixel-btn pixel-btn-red py-4 text-xs"
+                                className="mt-auto w-full btn-koopa py-4 text-xs"
                             >
                                 <X size={16} strokeWidth={3} className="mr-2" />
-                                FLEE BATTLE
+                                ABORT
                             </button>
                         </>
                     ) : (
                         <>
-                            <h2 className="text-xl font-retro text-yellow-400 mb-8 border-b-4 border-yellow-400 pb-2">CRITICAL HIT!</h2>
+                            <h2 className="text-xl font-retro text-red-600 mb-8 pb-2">ACTION REQUIRED</h2>
                             <p className="font-retro text-[10px] mb-12 text-center leading-loose">
-                                ENEMY DEFENSES ARE DOWN.<br />CHOOSE YOUR FATE.
+                                THE WINDOW IS OPEN.<br />EXECUTE CHOICE.
                             </p>
 
                             <div className="grid grid-cols-2 gap-4 w-full">
                                 <button
                                     onClick={() => handleOutcome("resisted")}
                                     disabled={isSubmitting}
-                                    className="pixel-btn pixel-btn-green py-6 text-[10px]"
+                                    className="pixel-btn pixel-btn-green py-6 text-[10px] text-black"
                                 >
-                                    VICTORY (RESIST)
+                                    RESIST (1-UP)
                                 </button>
                                 <button
                                     onClick={() => handleOutcome("consumed")}
                                     disabled={isSubmitting}
                                     className="pixel-btn pixel-btn-red py-6 text-[10px]"
                                 >
-                                    DEFEAT (CONSUME)
+                                    CONSUME
                                 </button>
                             </div>
                         </>
@@ -188,27 +188,27 @@ export default function CravingsManager({ onModalChange, initialSelection }: { o
         );
     }
 
-    // 2. TRIGGER SELECTION VIEW - SNES MENU
+    // 2. TRIGGER SELECTION VIEW - MARIO MENU
     if (selectionMode) {
         const isFood = selectionMode === "food";
 
         return (
-            <div className="w-full h-full bg-black flex flex-col border-4 border-white pixel-border">
-                <div className="border-b-4 border-white p-4 flex justify-between items-center bg-blue-900 text-white">
+            <div className="w-full h-full bg-[#5c94fc] flex flex-col border-4 border-black box-border">
+                <div className="border-b-4 border-black p-4 flex justify-between items-center bg-black text-white">
                     <h2 className="text-xs font-retro flex items-center gap-2">
-                        {isFood ? "🍕" : "🌿"} {selectionMode === "food" ? "FOOD" : "WEED"} MENU
+                        {isFood ? "⭐" : "🌻"} {selectionMode === "food" ? "FOOD" : "WEED"} PROTOCOL
                     </h2>
                     <button onClick={() => setSelectionMode(null)} className="text-white hover:text-red-500 transition-colors">
                         <X size={24} strokeWidth={3} />
                     </button>
                 </div>
 
-                <div className="flex-1 p-6 overflow-y-auto bg-blue-900/20">
-                    {/* CUSTOM FOOD FLOW - HUNGER METER */}
+                <div className="flex-1 p-6 overflow-y-auto bg-black/80 backdrop-blur-sm">
+                    {/* CUSTOM FOOD FLOW */}
                     {isFood ? (
-                        <div className="space-y-8">
+                        <div className="space-y-8 text-white">
                             <div>
-                                <label className="block text-[10px] font-retro text-white mb-4">HUNGER HP (1-10)</label>
+                                <label className="block text-[10px] font-retro mb-4">HUNGER LEVEL (1-10)</label>
                                 <div className="flex items-center gap-4">
                                     <input
                                         type="number"
@@ -219,28 +219,28 @@ export default function CravingsManager({ onModalChange, initialSelection }: { o
                                         className="w-16 h-16 text-2xl font-retro text-center border-4 border-white bg-black text-white focus:ring-0 rounded-none pixel-border"
                                     />
                                     <div className="flex-1 h-8 bg-gray-900 border-4 border-white relative pixel-border">
-                                        <div className="h-full bg-red-500" style={{ width: `${hungerLevel * 10}%` }} />
+                                        <div className="h-full bg-yellow-400" style={{ width: `${hungerLevel * 10}%` }} />
                                     </div>
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-[10px] font-retro text-white mb-4">TARGET ITEM</label>
+                                <label className="block text-[10px] font-retro mb-4">TARGET ITEM</label>
                                 <input
                                     type="text"
                                     value={foodDesc}
                                     onChange={(e) => setFoodDesc(e.target.value)}
                                     placeholder="ITEM NAME..."
-                                    className="w-full border-4 border-white p-4 font-retro text-xs bg-black text-white outline-none rounded-none pixel-border placeholder:text-gray-600"
+                                    className="w-full border-4 border-white p-4 font-retro text-xs bg-black text-white outline-none rounded-none pixel-border"
                                 />
                             </div>
                         </div>
                     ) : (
-                        /* WEED FLOW - STANDARD CATEGORIES */
-                        <div className="space-y-8">
+                        /* WEED FLOW */
+                        <div className="space-y-8 text-white">
                             {/* Category */}
                             <div>
-                                <label className="block text-[10px] font-retro text-white mb-4">SELECT CLASS</label>
+                                <label className="block text-[10px] font-retro mb-4">SELECT CATEGORY</label>
                                 <div className="grid grid-cols-2 gap-4">
                                     <button
                                         onClick={() => setCategory("enhancement")}
@@ -266,7 +266,7 @@ export default function CravingsManager({ onModalChange, initialSelection }: { o
                             {/* Specific Triggers */}
                             {category && (
                                 <div>
-                                    <label className="block text-[10px] font-retro text-white mb-4">SELECT ENEMY</label>
+                                    <label className="block text-[10px] font-retro mb-4">SPECIFIC TRIGGER</label>
                                     <div className="grid grid-cols-2 gap-2">
                                         {(category === "enhancement" ? TRIGGERS_ENHANCEMENT : TRIGGERS_AVOIDANCE).map(t => (
                                             <button
@@ -288,13 +288,13 @@ export default function CravingsManager({ onModalChange, initialSelection }: { o
                 </div>
 
                 {/* Footer Submit */}
-                <div className="p-6 border-t-4 border-white bg-black">
+                <div className="p-6 border-t-4 border-black bg-black">
                     <button
                         disabled={isFood ? isSubmitting : (!category || !specificTrigger || isSubmitting)}
                         onClick={handleStartImpulse}
-                        className="w-full pixel-btn pixel-btn-blue py-6 text-sm"
+                        className="w-full btn-koopa py-6 text-sm"
                     >
-                        {isSubmitting ? "LOADING..." : "BATTLE CRAVING"}
+                        {isSubmitting ? "LOADING..." : "INITIATE"}
                     </button>
                 </div>
             </div>
@@ -306,11 +306,11 @@ export default function CravingsManager({ onModalChange, initialSelection }: { o
         return (
             <button
                 onClick={() => setSelectionMode(initialSelection)}
-                className={`w-full h-full flex flex-col items-center justify-center gap-2 hover:scale-[1.05] transition-transform group border-4 border-white pixel-border pixel-btn ${initialSelection === "weed" ? "pixel-btn-green" : "pixel-btn-yellow"}`}
+                className={`w-full h-full flex flex-col items-center justify-center gap-2 hover:scale-[1.05] transition-transform group ${initialSelection === "weed" ? "text-green-800" : "text-yellow-900"}`}
             >
-                <span className="text-4xl filter drop-shadow-md">{initialSelection === "weed" ? "🌿" : "🍕"}</span>
-                <span className="font-retro text-xs uppercase text-shadow-sm">{initialSelection}</span>
-                <span className="opacity-0 group-hover:opacity-100 text-[8px] font-retro transition-opacity">PRESS START</span>
+                <span className="text-4xl filter drop-shadow-md">{initialSelection === "weed" ? "🌻" : "⭐"}</span>
+                <span className="font-retro text-xs uppercase text-black/60 pt-2">{initialSelection === 'weed' ? 'WEED' : 'FOOD'}</span>
+                <span className="font-retro text-[8px] uppercase text-black/40">PROTOCOL: {initialSelection === 'weed' ? 'ENHANCED' : 'CONSUME'}</span>
             </button>
         );
     }

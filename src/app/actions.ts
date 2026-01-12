@@ -382,3 +382,9 @@ export async function clearAllUserData() {
     });
     revalidatePath("/");
 }
+
+export async function checkSystemHealth() {
+    return {
+        dbConfigured: !!process.env.DATABASE_URL
+    };
+}
