@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { getLevelInfo, type LevelInfo } from "@/utils/xp";
 
 // Using the centralized access from lib/prisma
 
@@ -135,7 +136,32 @@ export type InsightsData = {
     agencyScore: number; // % of impulses where delay_start happened vs total impulses
     triggerDistribution: { category: string; count: number }[]; // Enhancement vs Avoidance
     aiVibeCheck: string; // The "Friendly AI Insight"
+    levelInfo: LevelInfo;
+    meditationStats: {
+        totalMinutes: number;
+        streakDays: number;
+    };
 };
+
+export async function logMeditation(durationMinutes: number) {
+    await ensureUser();
+
+    // Log the session
+    await prisma.event.create({
+        data: {
+            userId: DEMO_USER_ID,
+            module: "meditation",
+            eventType: "session",
+            payload: { duration: durationMinutes },
+        },
+    });
+
+    // Award XP (e.g., 5 XP per minute)
+    await addXP(durationMinutes * 5);
+
+    revalidatePath("/");
+    revalidatePath("/insights");
+}
 
 export async function addXP(amount: number) {
     await ensureUser();
@@ -171,6 +197,88 @@ export async function getInsightsData(): Promise<InsightsData> {
         },
         orderBy: { timestamp: "desc" },
     });
+
+    const userXP = await getUserXP();
+
+    // --- MEDITATION STATS ---
+    const meditationEvents = events.filter((e: any) => e.module === "meditation" && e.eventType === "session");
+    // Calculate total minutes
+    const totalMeditationMinutes = meditationEvents.reduce((acc: number, e: any) => {
+        return acc + ((e.payload as any).duration || 0);
+    }, 0);
+
+    // Calculate Streak (Consecutive days with at least one session)
+    // 1. Get unique days
+    const daysWithMeditation = new Set(
+        meditationEvents.map((e: any) => new Date(e.timestamp).toDateString())
+    );
+    // 2. Backward check from today
+    let currentStreak = 0;
+    const checkDate = new Date();
+    while (true) {
+        if (daysWithMeditation.has(checkDate.toDateString())) {
+            currentStreak++;
+            checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+            // Check if today is missing but yesterday exists? 
+            // Standard streak logic: if today is missing but I haven't meditated YET today, existing streak might persist.
+            // Simplified: If today OR yesterday has an entry, streak is alive.
+            // But for calculation, we just count backward. 
+            // If I missed today (so far), we check yesterday.
+            if (currentStreak === 0) {
+                // Check yesterday
+                checkDate.setDate(checkDate.getDate() - 1); // Move to yesterday
+                if (daysWithMeditation.has(checkDate.toDateString())) {
+                    // Reset checkDate to yesterday for the loop
+                    // currentStreak stays 0 for this iteration, but will increment next.
+                    // Actually, simpler logic:
+                    // Just count consecutive days in the Set sorted descending?
+                    break;
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+    }
+    // Re-calc simple streak: Sort unique dates descending.
+    const sortedDates = Array.from(daysWithMeditation)
+        .map(d => new Date(d))
+        .sort((a, b) => b.getTime() - a.getTime());
+
+    let streak = 0;
+    if (sortedDates.length > 0) {
+        const today = new Date();
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const lastDate = sortedDates[0];
+
+        // Is the streak alive? (Last date is Today or Yesterday)
+        const isAlive = lastDate.toDateString() === today.toDateString() ||
+            lastDate.toDateString() === yesterday.toDateString();
+
+        if (isAlive) {
+            streak = 1;
+            // Count backwards
+            for (let i = 0; i < sortedDates.length - 1; i++) {
+                const curr = sortedDates[i];
+                const next = sortedDates[i + 1];
+                const diffTime = Math.abs(curr.getTime() - next.getTime());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays === 1) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+    currentStreak = streak;
+
+
+    // 1. Top Triggers
 
     // 1. Top Triggers
     const impulseEvents = events.filter((e: any) => e.module === "cravings" && e.eventType === "impulse");
@@ -247,7 +355,12 @@ export async function getInsightsData(): Promise<InsightsData> {
         peakHours,
         agencyScore,
         triggerDistribution,
-        aiVibeCheck
+        aiVibeCheck,
+        levelInfo: getLevelInfo(userXP),
+        meditationStats: {
+            totalMinutes: totalMeditationMinutes,
+            streakDays: currentStreak,
+        }
     };
 }
 

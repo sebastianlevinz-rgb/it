@@ -2,22 +2,26 @@
 
 import { X, Wind, Box, Zap, Heart } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
+import { logMeditation } from "@/app/actions";
 
 type Phase = "inhale" | "hold" | "exhale" | "hold_empty";
-type Mode = "box" | "478" | "calm";
+// Defaulting to a single "Calm" mode for simplicity with the new timers, 
+// or we could allow config. For now, we use a balanced 4-4-4-4 Box or 5-5 Calm.
+// Let's go with "Deep Calm" (5-5) as general purpose.
+const BREATH_CYCLE = { inhale: 4000, hold: 4000, exhale: 4000, hold_empty: 4000 };
 
-const MODES = {
-    box: { name: "Box Breathing", inhale: 4000, hold: 4000, exhale: 4000, hold_empty: 4000, label: "Stability" },
-    "478": { name: "4-7-8 Relax", inhale: 4000, hold: 7000, exhale: 8000, hold_empty: 0, label: "Sleep & Calm" },
-    calm: { name: "Deep Calm", inhale: 5000, hold: 0, exhale: 5000, hold_empty: 0, label: "Balance" },
-};
 
 export default function BreatheModal({ onClose }: { onClose: () => void }) {
-    const [mode, setMode] = useState<Mode | null>(null);
+    const [isActive, setIsActive] = useState(false);
+    const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
+    const [timeLeft, setTimeLeft] = useState<number>(0);
+
     const [phase, setPhase] = useState<Phase>("inhale");
     const [text, setText] = useState("Ready");
+
     const audioCtxRef = useRef<AudioContext | null>(null);
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const breathTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const sessionTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     // TONE GENERATOR
     const playTone = useCallback((freq: number, type: "sine" | "triangle" = "sine", duration: number = 3) => {
@@ -42,8 +46,43 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
         osc.stop(ctx.currentTime + duration);
     }, []);
 
-    const startCycle = useCallback((selectedMode: Mode) => {
-        const config = MODES[selectedMode];
+    const startSession = (minutes: number) => {
+        setDurationMinutes(minutes);
+        setTimeLeft(minutes * 60);
+        setIsActive(true);
+        startCycle();
+    };
+
+    // Session Timer Logic
+    useEffect(() => {
+        if (!isActive || timeLeft <= 0) return;
+
+        sessionTimerRef.current = setInterval(() => {
+            setTimeLeft((prev) => {
+                if (prev <= 1) {
+                    // Session Complete
+                    clearInterval(sessionTimerRef.current!);
+                    completeSession();
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => {
+            if (sessionTimerRef.current) clearInterval(sessionTimerRef.current);
+        };
+    }, [isActive]);
+
+    const completeSession = async () => {
+        if (durationMinutes) {
+            await logMeditation(durationMinutes);
+        }
+        onClose();
+    };
+
+    const startCycle = useCallback(() => {
+        const config = BREATH_CYCLE;
 
         const runPhase = (currentPhase: Phase) => {
             setPhase(currentPhase);
@@ -56,21 +95,21 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
             switch (currentPhase) {
                 case "inhale":
                     duration = config.inhale;
-                    next = config.hold > 0 ? "hold" : "exhale";
+                    next = "hold";
                     label = "Inhale";
-                    tone = 164; // E3 (Deep)
+                    tone = 164; // E3
                     break;
                 case "hold":
                     duration = config.hold;
                     next = "exhale";
                     label = "Hold";
-                    tone = 0; // Silent hold
+                    tone = 0;
                     break;
                 case "exhale":
                     duration = config.exhale;
-                    next = config.hold_empty > 0 ? "hold_empty" : "inhale";
+                    next = "hold_empty";
                     label = "Exhale";
-                    tone = 110; // A2 (Release)
+                    tone = 110; // A2
                     break;
                 case "hold_empty":
                     duration = config.hold_empty;
@@ -83,7 +122,7 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
             setText(label);
             if (tone > 0) playTone(tone, "sine", duration / 1000);
 
-            timerRef.current = setTimeout(() => {
+            breathTimerRef.current = setTimeout(() => {
                 runPhase(next);
             }, duration);
         };
@@ -93,16 +132,12 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
 
     }, [playTone]);
 
-    useEffect(() => {
-        if (mode) {
-            startCycle(mode);
-        }
-
-        return () => {
-            if (timerRef.current) clearTimeout(timerRef.current);
-        };
-    }, [mode, startCycle]);
-
+    // Format Time MM:SS
+    const formatTime = (seconds: number) => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}:${s.toString().padStart(2, '0')}`;
+    };
 
     // CLEANUP
     useEffect(() => {
@@ -110,24 +145,26 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
             if (audioCtxRef.current?.state !== 'closed') {
                 audioCtxRef.current?.close();
             }
+            if (breathTimerRef.current) clearTimeout(breathTimerRef.current);
+            if (sessionTimerRef.current) clearInterval(sessionTimerRef.current);
         }
     }, []);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950 text-white animate-in zoom-in-90 duration-500 overflow-hidden">
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-950 text-white animate-in zoom-in-90 duration-500 overflow-hidden">
 
             {/* Dynamic Background Glow */}
             <div
                 className={`absolute inset-0 bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-black transition-all duration-[4000ms]`}
             >
                 {/* Breathing Pulse Overlay */}
-                {mode && (
+                {isActive && (
                     <div
                         className="absolute inset-0 bg-[#3B82F6]/10 mix-blend-screen transition-all ease-in-out"
                         style={{
                             opacity: phase === 'inhale' ? 0.4 : 0.1,
                             transform: `scale(${phase === 'inhale' ? 1.1 : 1})`,
-                            transitionDuration: `${phase === 'inhale' ? MODES[mode].inhale : phase === 'exhale' ? MODES[mode].exhale : 1000}ms`
+                            transitionDuration: `${phase === 'inhale' ? BREATH_CYCLE.inhale : phase === 'exhale' ? BREATH_CYCLE.exhale : 1000}ms`
                         }}
                     />
                 )}
@@ -140,61 +177,55 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
                 <X size={32} />
             </button>
 
-            {!mode ? (
+            {!isActive ? (
                 // SELECTION SCREEN
-                <div className="w-full max-w-md p-6 flex flex-col gap-6 animate-in slide-in-from-bottom-10 fade-in duration-500 relative z-10">
-                    <h2 className="text-3xl font-bold text-center mb-4 tracking-tight">Choose Focus</h2>
+                <div className="w-full max-w-md p-8 flex flex-col gap-6 animate-in slide-in-from-bottom-10 fade-in duration-500 relative z-10 text-center">
+                    <h2 className="text-4xl font-black mb-6 tracking-tight drop-shadow-lg">Take a Moment</h2>
 
-                    <button onClick={() => setMode("box")} className="group bg-white/5 hover:bg-white/10 p-6 rounded-3xl border border-white/10 transition-all hover-lift active-squish flex items-center gap-5">
-                        <div className="p-4 bg-blue-500/20 rounded-full text-blue-400 group-hover:text-white">
-                            <Box size={28} />
-                        </div>
-                        <div className="text-left">
-                            <h3 className="font-bold text-xl">Box Breathing</h3>
-                            <p className="text-gray-400 text-sm">Stability & Focus</p>
-                        </div>
-                    </button>
-
-                    <button onClick={() => setMode("478")} className="group bg-white/5 hover:bg-white/10 p-6 rounded-3xl border border-white/10 transition-all hover-lift active-squish flex items-center gap-5">
-                        <div className="p-4 bg-purple-500/20 rounded-full text-purple-400 group-hover:text-white">
-                            <Zap size={28} />
-                        </div>
-                        <div className="text-left">
-                            <h3 className="font-bold text-xl">4-7-8 Relax</h3>
-                            <p className="text-gray-400 text-sm">Deep Rest</p>
-                        </div>
-                    </button>
-
-                    <button onClick={() => setMode("calm")} className="group bg-white/5 hover:bg-white/10 p-6 rounded-3xl border border-white/10 transition-all hover-lift active-squish flex items-center gap-5">
-                        <div className="p-4 bg-emerald-500/20 rounded-full text-emerald-400 group-hover:text-white">
-                            <Heart size={28} />
-                        </div>
-                        <div className="text-left">
-                            <h3 className="font-bold text-xl">Deep Calm</h3>
-                            <p className="text-gray-400 text-sm">Balance</p>
-                        </div>
-                    </button>
+                    <div className="grid grid-cols-1 gap-4">
+                        {[5, 10, 15].map((mins) => (
+                            <button
+                                key={mins}
+                                onClick={() => startSession(mins)}
+                                className="group w-full bg-white/5 hover:bg-white/10 p-6 rounded-[24px] border border-white/5 transition-all hover-lift active-squish flex items-center justify-between"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-blue-500/20 rounded-full text-blue-400 group-hover:bg-blue-500/30 transition-colors">
+                                        <Wind size={24} />
+                                    </div>
+                                    <span className="font-bold text-2xl">{mins} Min</span>
+                                </div>
+                                <span className="text-sm font-medium text-white/40 group-hover:text-white/80 transition-colors">Start &rarr;</span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
             ) : (
-                // ACTIVE BREATHING SCREEN (PULSING GLOW)
-                <div className="flex flex-col items-center gap-12 relative z-10 scale-125">
+                // ACTIVE BREATHING SCREEN (FLEXBOX CENTERED)
+                <div className="flex flex-col items-center justify-between h-full w-full py-12 relative z-10">
 
-                    <div className="relative flex items-center justify-center">
+                    {/* Top: Timer */}
+                    <div className="text-center opacity-80 mt-12">
+                        <span className="font-mono text-xl tracking-widest">{formatTime(timeLeft)}</span>
+                    </div>
+
+                    {/* Center: Breath Visual */}
+                    <div className="flex-1 flex flex-col items-center justify-center relative w-full">
                         {/* Core Pulse */}
                         <div
-                            className={`rounded-full blur-[80px] transition-all ease-in-out bg-blue-500/30
-                            ${phase === "inhale" || phase === "hold" ? "w-[500px] h-[500px] opacity-60" : "w-[250px] h-[250px] opacity-20"}
+                            className={`rounded-full blur-[80px] transition-all ease-in-out bg-blue-500/30 absolute
+                            ${phase === "inhale" || phase === "hold" ? "w-[400px] h-[400px] opacity-60" : "w-[200px] h-[200px] opacity-20"}
                             `}
-                            style={{ transitionDuration: `${phase === 'inhale' ? MODES[mode].inhale : phase === 'exhale' ? MODES[mode].exhale : 1000}ms` }}
+                            style={{ transitionDuration: `${phase === 'inhale' ? BREATH_CYCLE.inhale : phase === 'exhale' ? BREATH_CYCLE.exhale : 1000}ms` }}
                         />
 
                         {/* Geometric Circle */}
                         <div
-                            className={`absolute z-10 flex items-center justify-center transition-all ease-in-out border border-white/20
+                            className={`z-10 flex items-center justify-center transition-all ease-in-out border border-white/20
                             ${(phase === "inhale" || phase === "hold") ? "w-64 h-64 bg-white/5 scale-100 shadow-[0_0_50px_rgba(59,130,246,0.5)]" : "w-32 h-32 bg-transparent scale-75 shadow-none"}
-                            rounded-full`}
+                            rounded-full mb-8`}
                             style={{
-                                transitionDuration: `${phase === 'inhale' ? MODES[mode].inhale : phase === 'exhale' ? MODES[mode].exhale : 1000}ms`
+                                transitionDuration: `${phase === 'inhale' ? BREATH_CYCLE.inhale : phase === 'exhale' ? BREATH_CYCLE.exhale : 1000}ms`
                             }}
                         >
                             <Wind
@@ -202,17 +233,23 @@ export default function BreatheModal({ onClose }: { onClose: () => void }) {
                                 className={`text-white transition-all
                                 ${phase === "exhale" ? "opacity-50 scale-75" : "opacity-100 scale-110"}
                                 `}
-                                style={{ transitionDuration: `${phase === 'inhale' ? MODES[mode].inhale : phase === 'exhale' ? MODES[mode].exhale : 1000}ms` }}
+                                style={{ transitionDuration: `${phase === 'inhale' ? BREATH_CYCLE.inhale : phase === 'exhale' ? BREATH_CYCLE.exhale : 1000}ms` }}
                             />
                         </div>
-                    </div>
 
-                    <div className="text-center">
-                        <h2 className="text-4xl font-black tracking-widest uppercase transition-all duration-500 drop-shadow-xl text-blue-100">
+                        {/* Text (Perfectly Centered via Flex parent) */}
+                        <h2 className="text-5xl font-black tracking-widest uppercase transition-all duration-500 drop-shadow-xl text-blue-100 absolute" style={{ top: '65%' }}>
                             {text}
                         </h2>
-                        <button onClick={() => setMode(null)} className="text-gray-500 mt-8 text-sm font-medium hover:text-white transition-colors">
-                            Change Focus
+                    </div>
+
+                    {/* Bottom: Ghost Button */}
+                    <div className="mb-8">
+                        <button
+                            onClick={onClose}
+                            className="px-6 py-3 rounded-full border border-red-500/30 bg-red-500/10 text-red-300 font-bold text-sm tracking-wide hover:bg-red-500/20 active:scale-95 transition-all"
+                        >
+                            End Session Early
                         </button>
                     </div>
                 </div>
