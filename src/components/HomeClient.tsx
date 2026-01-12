@@ -38,7 +38,8 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
     };
 
     return (
-        <main className="h-[100svh] min-h-[100svh] flex flex-col font-sans max-w-md mx-auto bg-white text-black overflow-hidden relative border-x-2 border-black">
+        <main className="h-[100svh] min-h-[100svh] flex flex-col font-retro max-w-md mx-auto bg-black text-white overflow-hidden relative border-x-4 border-white pixel-border">
+            <div className="scanline"></div>
 
             {/* Breathe Modal */}
             {showBreathe && (
@@ -48,55 +49,56 @@ export default function HomeClient({ agencyScore }: { agencyScore: number | null
                 />
             )}
 
-            {/* HEADER GRID - SECTOR A */}
-            <header className="border-b-2 border-black p-6 flex flex-col gap-6 shrink-0 bg-white z-10">
+            {/* HEADER GRID - HERO STATS */}
+            <header className="p-4 flex flex-col gap-4 shrink-0 bg-black z-10 border-b-4 border-white pixel-border pb-6">
                 <div className="flex justify-between items-start">
                     <div>
-                        <h1 className="text-5xl font-extrabold tracking-tighter leading-none">IMPULSE</h1>
-                        <p className="text-sm font-bold tracking-widest mt-1">MODERNIST PROTOCOL V3.3</p>
+                        <h1 className="text-xl leading-relaxed text-yellow-400 drop-shadow-md">HERO: SEBASTIAN</h1>
+                        <p className="text-xs mt-2 text-gray-400">QUEST: IMPULSE TRACKER</p>
                     </div>
-                    <Link href="/settings" className="p-2 border-2 border-black hover:bg-black hover:text-white transition-colors">
-                        <Settings size={28} strokeWidth={2.5} />
+                    <Link href="/settings" className="p-2 border-4 border-white hover:bg-white hover:text-black transition-colors pixel-btn">
+                        <Settings size={20} strokeWidth={3} />
                     </Link>
                 </div>
 
-                {/* XP Bar - Swiss Frame */}
+                {/* XP Bar - RPG Style */}
                 {levelInfo && !showBreathe && !isCravingModalOpen && (
-                    <div className="w-full">
-                        <div className="flex justify-between items-end mb-2 font-mono text-xs font-bold uppercase">
-                            <span>Sector: {levelInfo.title}</span>
-                            <span>{levelInfo.currentXP} / {levelInfo.nextThreshold} XP</span>
+                    <div className="w-full mt-2">
+                        <div className="flex justify-between items-end mb-2 text-[10px] uppercase tracking-widest text-green-400">
+                            <span>LVL 1 - NOVICE</span>
+                            <span>{levelInfo.currentXP}/{levelInfo.nextThreshold} EXP</span>
                         </div>
-                        <div className="swiss-bar-frame">
+                        <div className="border-4 border-white h-6 w-full bg-gray-900 relative">
                             <div
-                                className="swiss-bar-fill"
-                                style={{ width: `${levelInfo.progressPercent}%` }}
+                                className="h-full bg-green-500 transition-all duration-500"
+                                style={{ width: `${levelInfo.progressPercent}%`, boxShadow: 'inset 0 -2px 0 rgba(0,0,0,0.5)' }}
                             />
                         </div>
                     </div>
                 )}
             </header>
 
-            {/* MAIN GRID - SECTOR B */}
-            <div className={`flex-1 flex flex-col justify-between bg-white transform transition-all duration-300 ${isCravingModalOpen ? 'p-0' : 'p-6'}`}>
+            {/* MAIN GRID - BATTLE ARENA */}
+            <div className={`flex-1 flex flex-col justify-between bg-black transform transition-all duration-300 ${isCravingModalOpen ? 'p-0' : 'p-6'}`}>
 
                 {!isCravingModalOpen ? (
                     <div className="flex flex-col gap-8 h-full justify-center">
-                        {/* Take a Moment - Massive Block */}
+
+                        {/* MEDITATE - Blue Button */}
                         <button
                             onClick={() => setShowBreathe(true)}
-                            className="btn-swiss-black w-full text-xl py-8 drop-shadow-[4px_4px_0_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:drop-shadow-none transition-all"
+                            className="pixel-btn pixel-btn-blue w-full py-8 text-sm hover:scale-[1.02]"
                         >
-                            <Wind size={24} strokeWidth={3} />
-                            <span>Take a Moment</span>
+                            <span className="text-2xl mr-4">🧘</span>
+                            <span>MEDITATE</span>
                         </button>
 
                         {/* The Choice - Split Grid */}
-                        <div className="grid grid-cols-2 gap-0 border-2 border-black h-48 w-full drop-shadow-[4px_4px_0_rgba(0,0,0,1)]">
-                            <div className="border-r-2 border-black h-full">
+                        <div className="grid grid-cols-2 gap-4 w-full">
+                            <div className="h-48">
                                 <CravingsManager onModalChange={setIsCravingModalOpen} initialSelection="weed" />
                             </div>
-                            <div className="h-full">
+                            <div className="h-48">
                                 <CravingsManager onModalChange={setIsCravingModalOpen} initialSelection="food" />
                             </div>
                         </div>
